@@ -1,0 +1,10 @@
+{
+  "name": "sails",
+  "version": "1.0.0",
+  "workspaces": [
+    "gql",
+    "rest",
+    "shared"
+  ],
+  "private": true
+}
