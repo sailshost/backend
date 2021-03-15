@@ -1,0 +1,64 @@
+version: '3.7'
+services:
+  reverse-proxy:
+      image: traefik:v2.2
+      command: --api.insecure=true --providers.docker
+      ports:
+          - '80:80'
+          - '443:443'
+          - '8080:8080'
+      volumes:
+          - /var/run/docker.sock:/var/run/docker.sock
+  pg:
+    image: postgres
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: 'sails'
+      POSTGRES_DB: 'sails'
+      POSTGRES_PASSWORD: 'sails'
+    logging:
+      driver: none
+
+  redis:
+      container_name: 'redis'
+      image: 'redis'
+      ports:
+          - '127.0.0.1:6379:6379'
+      volumes:
+          - 'redisdata:/data'      
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    volumes:
+       - 'rabbitmq_data:/data'
+    environment:
+        RABBITMQ_ERLANG_COOKIE: sails-is-the-best
+        RABBITMQ_DEFAULT_USER: sails
+        RABBITMQ_DEFAULT_PASS: Aj061ok4c4hxSe4eiVtog85P1
+    ports:
+        - 5672:5672
+        - 15672:15672
+        
+  backend:
+    image: node:13
+    command: yarn workspace @sails/rest start
+    ports:
+        - '127.0.0.1:1337:1337'
+    volumes:
+        - .:/srv/backend:rw
+    working_dir: /srv/backend
+    # env_file:
+    #     - .env
+    depends_on:
+        - rabbitmq
+        - pg
+        # - redis
+    labels:
+        - 'traefik.http.routers.backend.rule=Host(`sails.localhost`) && PathPrefix(`/api`)' 
+
+volumes:
+  rabbitmq_data:
+  redisdata: {}
+  pgdata: {}

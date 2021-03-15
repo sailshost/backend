@@ -1,27 +1,16 @@
-import { existsSync, readFileSync } from "fs";
-import { join } from "path";
+import sendgrid from "@sendgrid/mail";
+require('dotenv').config();
 
-export const prod = process.env.DEPLOY_ENV === 'prod';
+sendgrid.setApiKey(process.env.SENDGRID_API_KEY);
 
-export function extractEnv(key: string, dirname: string = __dirname) {
-  if (process.env.NODE_ENV === 'production') {
-    return process.env[key];
-  } else {
-    let filePath = join(`${dirname}/.env`);
-    if (!existsSync(filePath)) filePath = join(`${dirname}/../.env`);
-    if (!existsSync(filePath)) filePath = join(`${dirname}/../../.env`);
-    if (!existsSync(filePath)) filePath = join(`${dirname}/../../../.env`);
-    if (!existsSync(filePath)) filePath = join(`${dirname}/../../../../.env`);
-    if (!existsSync(filePath)) filePath = join(`${dirname}/../../../../../.env`);
-    if (!existsSync(filePath)) filePath = join(`${dirname}/../../../../../../.env`);
-    if (existsSync(filePath)) {
-      const file = readFileSync(filePath).toString();
-      const keys = file.split('\n');
-      for (let value of keys) {
-        value = value.replace(" ", "").replace("\r", '');
-        if (value.startsWith(`${key}=`)) return value.replace(`${key}=`, "");
-      }
-    }
+export function sendMail(email: string, template: string, dynamic: object) {
+  const message = {
+    to: email,
+    from: "SailsHost <no-reply@sails.host>",
+    templateId: template,
+    dynamic_template_data: dynamic
   }
-  return undefined;
+
+  sendgrid.send(message).then(() => console.log("<--> Backend: Email sent successfully."))
+  .catch(console.error);
 }

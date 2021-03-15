@@ -1,0 +1,1 @@
+export const SAILS_COOKIE: string = "sails.auth";

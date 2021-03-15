@@ -1,9 +1,0 @@
-{
-  "name": "rest",
-  "version": "1.0.0",
-  "workspaces": [
-    "app",
-    "packages/*"
-  ],
-  "private": true
-}
