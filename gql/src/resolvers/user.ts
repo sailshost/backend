@@ -58,15 +58,15 @@ export class UserResolver {
 
       const link = `${process.env.IS_PROD ? "http://localhost:3000" : "https://sails.host"}/password/${token}`;
 
-      // sendMail(
-      //   options.email,
-      //   "d-f38009cead11457cb4a1b57b30c2312c",
-      //   {
-      //     subject: "Welcome to sails!",
-      //     link: link,
-      //     name: options.name
-      //   } 
-      // );
+      sendMail(
+        options.email,
+        "d-f38009cead11457cb4a1b57b30c2312c",
+        {
+          subject: "Welcome to sails!",
+          link: link,
+          name: options.name
+        } 
+      );
 
       console.log(link);
     } catch (err) {
@@ -83,8 +83,6 @@ export class UserResolver {
     }
 
     ctx.em.persistAndFlush(user);
-
-    ctx.req.session.userId = user.id;
 
     return { user };
   }
@@ -119,9 +117,9 @@ export class UserResolver {
     }
 
     const key = `password:${options.token}`;
-    const token = await ctx.redis.get(key);
+    const redisToken = await ctx.redis.get(key);
 
-    if (!token) {
+    if (!redisToken) {
       return {
         errors: [
           {
@@ -132,7 +130,7 @@ export class UserResolver {
       };
     }
 
-    const user = await ctx.em.findOne(User, { token: token });
+    const user = await ctx.em.findOne(User, { token: options.token });
 
     if (!user) {
       return {
@@ -190,15 +188,15 @@ export class UserResolver {
 
       const link = `${process.env.IS_PROD ? "http://localhost:3000" : "https://sails.host"}/password/${token}`;
 
-      // sendMail(
-      //   user.email,
-      //   "d-f38009cead11457cb4a1b57b30c2312c",
-      //   {
-      //     subject: "Email verification",
-      //     link: link,
-      //     name: user.name
-      //   } 
-      // );
+      sendMail(
+        user.email,
+        "d-f38009cead11457cb4a1b57b30c2312c",
+        {
+          subject: "Email verification",
+          link: link,
+          name: user.name
+        } 
+      );
 
       console.log(link)
     } catch(err) {
@@ -211,7 +209,7 @@ export class UserResolver {
         ],
       };
     }
-    
+
     ctx.req.session.userId = user.id;
 
     return { user };
