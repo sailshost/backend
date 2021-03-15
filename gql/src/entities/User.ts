@@ -47,4 +47,8 @@ export class User {
 
   @Property({ type: "text", nullable: true })
   password?: string;
+
+  // @Field()
+  // @Property({ type: ArrayType })
+  // sites: string[];
 }
