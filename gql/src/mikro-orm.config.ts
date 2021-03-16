@@ -1,6 +1,6 @@
 import { MikroORM } from "@mikro-orm/core";
 
-import { User } from "./entities";
+import { Container, User } from "./entities";
 import path from "path";
 
 export default {
@@ -9,6 +9,6 @@ export default {
     pattern: /^[\w-]+\d+\.[tj]s$/,
   },
   type: "postgresql",
-  entities: [User],
+  entities: [User, Container],
   clientUrl: "postgresql://postgres:sails@localhost/sails",
 } as Parameters<typeof MikroORM.init>[0];

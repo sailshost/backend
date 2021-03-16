@@ -11,7 +11,8 @@ import ioredis from "ioredis";
 import connectRedis from "connect-redis";
 import session from "express-session";
 import { UserResolver } from "./resolvers/user";
-import { SAILS_COOKIE } from "./constants";
+import { IS_PROD, SAILS_COOKIE } from "./constants";
+import { ContainerResolver } from "./resolvers/container";
 require('dotenv-safe').config();
 
 const app = express();
@@ -27,7 +28,7 @@ const main = async () => {
   app.use(
     cors({
       credentials: true,
-      origin: process.env.IS_PROD === true ? "https://sails.host" : "http://localhost:3000",
+      origin: IS_PROD ? "https://sails.host" : "http://localhost:3000",
     })
   );
 
@@ -39,8 +40,8 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
         httpOnly: true,
         sameSite: "lax",
-        secure: process.env.IS_PROD === true ? true : false,
-        domain: process.env.IS_PROD === true ? ".sails.host" : undefined,
+        secure: IS_PROD ? true : false,
+        domain: IS_PROD ? ".sails.host" : undefined,
       },
       saveUninitialized: false,
       secret: SAILS_COOKIE,
@@ -51,28 +52,29 @@ const main = async () => {
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
       emitSchemaFile: true,
-      resolvers: [UserResolver],
+      resolvers: [UserResolver, ContainerResolver],
       validate: false
     }),
     introspection: true,
+    playground: IS_PROD ? false : true,
     debug: true,
     context: ({ req, res }) => ({ em: orm.em, req, res, redis }),
     formatError: (error: ApolloError) => {
       if (error.originalError instanceof ApolloError) {
         return error;
       }
-      process.env.IS_PROD === true ? "" : console.log(error);
+      IS_PROD ? "" : console.log(error);
       return new ApolloError("Internal server error", "INTERNAL_SERVER_ERROR");
     }
   })
 
   apolloServer.applyMiddleware({
     app,
-    path: process.env.IS_PROD === true ? "/api/graphql" : "/graphql",
+    path: "/graphql",
     cors: false
   });
   
-  app.listen(4000, () => console.log(`🚀 Server is online and ready @ http://localhost:4000/${process.env.IS_PROD ? "graphql" : "api/graphql"}`));
+  app.listen(4000, () => console.log(`🚀 Server is online and ready @ http://localhost:4000/graphql`));
 }
 
 main().catch((err) => console.error(err));

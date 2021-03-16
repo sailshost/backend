@@ -468,6 +468,11 @@
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.17.54.tgz#a737488631aca3ec7bd9f6229d77f1079e444793"
   integrity sha512-c8Lm7+hXdSPmWH4B9z/P/xIXhFK3mCQin4yCYMd2p1qpMG5AfgyJuYZ+3q2dT7qLiMMMGMd5dnkFpdqJARlvtQ==
 
+"@types/project-name-generator@^2.1.0":
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/@types/project-name-generator/-/project-name-generator-2.1.0.tgz#e8e219d569a4d1bf13c6c305814c65155f6fa7d6"
+  integrity sha512-4uIey+OB/9m4KouTnm2OKM0m5OCGixRhoPUHFNP088ESdkSq1xrlANrtKVKBJlRVVACdLstf71OsGSxHgjCoFw==
+
 "@types/qs@*":
   version "6.9.5"
   resolved "https://registry.yarnpkg.com/@types/qs/-/qs-6.9.5.tgz#434711bdd49eb5ee69d90c1d67c354a9a8ecb18b"
@@ -1201,7 +1206,7 @@ commander@^2.20.3:
   resolved "https://registry.yarnpkg.com/commander/-/commander-2.20.3.tgz#fd485e84c03eb4881c20722ba48035e8531aeb33"
   integrity sha512-GpVkmM8vF2vQUkj2LvZmD35JxeJOLCwJ9cUkugyk2nuhbv3+mJvpLYYt+0+USMxE+oj+ey/lJEnhZw75x/OMcQ==
 
-commander@^6.2.0:
+commander@^6.1.0, commander@^6.2.0:
   version "6.2.1"
   resolved "https://registry.yarnpkg.com/commander/-/commander-6.2.1.tgz#0792eb682dfbc325999bb2b84fddddba110ac73c"
   integrity sha512-U7VdrJFnJgo4xjrHpTzu0yrHPGImdsmD95ZlgYSEajAn2JKzDhDTPG9kBTefmObL2w/ngeZnilk+OV9CG3d7UA==
@@ -3313,6 +3318,14 @@ process-nextick-args@~2.0.0:
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/process-nextick-args/-/process-nextick-args-2.0.1.tgz#7820d9b16120cc55ca9ae7792680ae7dba6d7fe2"
   integrity sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==
+
+project-name-generator@^2.1.9:
+  version "2.1.9"
+  resolved "https://registry.yarnpkg.com/project-name-generator/-/project-name-generator-2.1.9.tgz#959177f1feb2355d74fa98745d72a65a5f75b674"
+  integrity sha512-QmLHqz2C4VHmAyDEAFlVfnuWAHr4vwZhK2bbm4IrwuHNzNKOdG9b4U+NmQbsm1uOoV4kGWv7+FVLsu7Bb/ieYQ==
+  dependencies:
+    commander "^6.1.0"
+    lodash "^4.17.20"
 
 proxy-addr@~2.0.5:
   version "2.0.6"

@@ -3,6 +3,17 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type Container {
+  id: String!
+  name: String!
+  origin: String!
+  user: User!
+}
+
+input ContainerInput {
+  name: String!
+}
+
 input CreatePasswordInput {
   confirmPassword: String!
   password: String!
@@ -15,14 +26,20 @@ type FieldError {
 }
 
 type Mutation {
+  createContainer(options: ContainerInput!): Response!
   createPassword(options: CreatePasswordInput!): UserResponse!
   resendEmail(email: String!): UserResponse!
   signup(options: SignupInput!): UserResponse!
 }
 
 type Query {
-  createPassword(options: CreatePasswordInput!): String!
-  signup(options: SignupInput!): String!
+  getContainer(origin: String!): Response!
+  me: User!
+}
+
+type Response {
+  container: Container
+  errors: [FieldError!]
 }
 
 input SignupInput {

@@ -16,12 +16,8 @@ import { sendMail } from "@sails/shared";
 import argon2 from "argon2";
 import { isAuthed } from "../middleware/isAuthed";
 import { CreatePasswordInput } from "../input/CreatePasswordInput";
-
-@ObjectType()
-class FieldError {
-  @Field() field!: string;
-  @Field() message!: string;
-}
+import { IS_PROD } from "../constants";
+import { FieldError } from "../entities/FieldError";
 
 @ObjectType()
 class UserResponse {
@@ -31,8 +27,25 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
+  @Query(() => User)
+  @UseMiddleware(isAuthed)
+  async me(
+    @Ctx() ctx: MyCtx
+  ): Promise<User> {
+    if (!ctx.req.session.userId) {
+      return null;
+    }
+    let user;
+    try {
+      user = await ctx.em.findOne(User, { id: ctx.req.session.userId });
+    } catch(err) {
+
+    }
+
+    return user;
+  }
+
   @Mutation(() => UserResponse)
-  @Query(() => String)
   async signup(
     @Arg("options") options: SignupInput,
     @Ctx() ctx: MyCtx
@@ -56,7 +69,7 @@ export class UserResolver {
 
       user.token = token;
 
-      const link = `${process.env.IS_PROD ? "http://localhost:3000" : "https://sails.host"}/password/${token}`;
+      const link = `${IS_PROD ? "http://localhost:3000" : "https://sails.host"}/password/${token}`;
 
       sendMail(
         options.email,
@@ -89,7 +102,6 @@ export class UserResolver {
 
   // @UseMiddleware(isAuthed)
   @Mutation(() => UserResponse)
-  @Query(() => String)
   async createPassword(
     @Arg("options") options: CreatePasswordInput,
     @Ctx() ctx: MyCtx
@@ -173,6 +185,17 @@ export class UserResolver {
     }
 
     try {
+      if(user.emailCompleted) {
+        return {
+          errors: [
+            {
+              field: "email",
+              message: "Your email is already verified"
+            }
+          ]
+        }
+      }
+
       const token = v4();
 
       user.token = token;
@@ -186,7 +209,7 @@ export class UserResolver {
 
       ctx.em.persistAndFlush(user);
 
-      const link = `${process.env.IS_PROD ? "http://localhost:3000" : "https://sails.host"}/password/${token}`;
+      const link = `${IS_PROD ? "http://localhost:3000" : "https://sails.host"}/password/${token}`;
 
       sendMail(
         user.email,

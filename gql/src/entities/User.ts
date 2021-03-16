@@ -11,6 +11,7 @@ import {
   Unique,
 } from "@mikro-orm/core";
 import { Field, ObjectType } from "type-graphql";
+import { Container } from "./Container";
 
 
 @ObjectType()
@@ -48,7 +49,10 @@ export class User {
   @Property({ type: "text", nullable: true })
   password?: string;
 
+  @Property({ type: "text", nullable: true })
+  emailCompleted?: boolean;
+
+  // @OneToMany(() => Container, c => c.user, { cascade: [Cascade.ALL] })
   // @Field()
-  // @Property({ type: ArrayType })
-  // sites: string[];
+  // containers = new Collection<Container>(this);
 }
