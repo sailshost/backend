@@ -29,18 +29,14 @@ class UserResponse {
 export class UserResolver {
   @Query(() => User)
   @UseMiddleware(isAuthed)
-  async me(
-    @Ctx() ctx: MyCtx
-  ): Promise<User> {
+  async me(@Ctx() ctx: MyCtx): Promise<User> {
     if (!ctx.req.session.userId) {
       return null;
     }
     let user;
     try {
       user = await ctx.em.findOne(User, { id: ctx.req.session.userId });
-    } catch(err) {
-
-    }
+    } catch (err) {}
 
     return user;
   }
@@ -55,43 +51,36 @@ export class UserResolver {
       user = ctx.em.create(User, {
         id: v4(),
         email: options.email,
-        name: options.name
+        name: options.name,
       });
 
       const token = v4();
 
-      await ctx.redis.set(
-        `password:${token}`,
-        user.id,
-        "ex",
-        86400000
-      );
+      await ctx.redis.set(`password:${token}`, user.id, "ex", 86400000);
 
       user.token = token;
 
-      const link = `${IS_PROD ? "http://localhost:3000" : "https://sails.host"}/password/${token}`;
+      const link = `${
+        IS_PROD ? "https://sails.host" : "http://localhost:3000"
+      }/password/${token}`;
 
-      sendMail(
-        options.email,
-        "d-f38009cead11457cb4a1b57b30c2312c",
-        {
-          subject: "Welcome to sails!",
-          link: link,
-          name: options.name
-        } 
-      );
-
-      console.log(link);
+      IS_PROD
+        ? sendMail(user.email, "d-f38009cead11457cb4a1b57b30c2312c", {
+            subject: "Email verification",
+            link: link,
+            name: user.name,
+          })
+        : console.log(link);
     } catch (err) {
       // if (err.code === "23505") {
-        return {
-          errors: [
-            {
-              field: "unknown",
-              message: `Something went wrong - ${err.stack}`,
-            },
-          ],
-        };
+      return {
+        errors: [
+          {
+            field: "unknown",
+            message: `Something went wrong - ${err.stack}`,
+          },
+        ],
+      };
       // }
     }
 
@@ -173,56 +162,49 @@ export class UserResolver {
   ): Promise<UserResponse> {
     const user = await ctx.em.findOne(User, { email });
 
-    if(!user) {
+    if (!user) {
       return {
         errors: [
           {
             field: "email",
-            message: "Unable to find that email"
-          }
-        ]
-      }
+            message: "Unable to find that email",
+          },
+        ],
+      };
     }
 
     try {
-      if(user.emailCompleted) {
+      if (user.emailCompleted) {
         return {
           errors: [
             {
               field: "email",
-              message: "Your email is already verified"
-            }
-          ]
-        }
+              message: "Your email is already verified",
+            },
+          ],
+        };
       }
 
       const token = v4();
 
       user.token = token;
 
-      await ctx.redis.set(
-        `password:${token}`,
-        user.id,
-        "ex",
-        86400000 
-      );
+      await ctx.redis.set(`password:${token}`, user.id, "ex", 86400000);
 
       ctx.em.persistAndFlush(user);
 
-      const link = `${IS_PROD ? "http://localhost:3000" : "https://sails.host"}/password/${token}`;
+      const link = `${
+        IS_PROD ? "https://sails.host" : "http://localhost:3000"
+      }/password/${token}`;
 
-      sendMail(
-        user.email,
-        "d-f38009cead11457cb4a1b57b30c2312c",
-        {
-          subject: "Email verification",
-          link: link,
-          name: user.name
-        } 
-      );
-
-      console.log(link)
-    } catch(err) {
+      IS_PROD
+        ? sendMail(user.email, "d-f38009cead11457cb4a1b57b30c2312c", {
+            subject: "Email verification",
+            link: link,
+            name: user.name,
+          })
+        : console.log(link);
+    } catch (err) {
       return {
         errors: [
           {
@@ -237,5 +219,4 @@ export class UserResolver {
 
     return { user };
   }
-    
 }

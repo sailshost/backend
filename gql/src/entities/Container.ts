@@ -1,4 +1,12 @@
-import { Entity, ManyToOne, PrimaryKey, Property } from "@mikro-orm/core";
+import {
+  Entity,
+  OneToMany,
+  OneToOne,
+  Cascade,
+  PrimaryKey,
+  Property,
+  ManyToOne,
+} from "@mikro-orm/core";
 import { Field, ObjectType } from "type-graphql";
 import { User } from ".";
 
@@ -7,21 +15,15 @@ import { User } from ".";
 export class Container {
   @Field()
   @PrimaryKey()
-  id: string;
+  id!: string;
 
-  @Field()
+  @ManyToOne(() => User, { nullable: true })
+  owner!: User;
+
+  @Field({ nullable: true })
   @Property({ type: "text" })
   origin: string;
 
-  @Field()
   @Property({ type: "text" })
   name: string;
-
-  @Field()
-  @ManyToOne()
-  user?: User;
-
-  // @Field()
-  // @Property({ type: "text" })
-  // ownerID?: string;
 }

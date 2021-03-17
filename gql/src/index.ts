@@ -2,7 +2,7 @@ import "reflect-metadata";
 import "dotenv-safe/config";
 import { ApolloError, ApolloServer } from "apollo-server-express";
 import { MikroORM } from "@mikro-orm/core";
-import express from "express"
+import express from "express";
 import { buildSchema } from "type-graphql";
 import cors from "cors";
 import config from "./mikro-orm.config";
@@ -13,7 +13,7 @@ import session from "express-session";
 import { UserResolver } from "./resolvers/user";
 import { IS_PROD, SAILS_COOKIE } from "./constants";
 import { ContainerResolver } from "./resolvers/container";
-require('dotenv-safe').config();
+require("dotenv-safe").config();
 
 const app = express();
 
@@ -53,7 +53,7 @@ const main = async () => {
     schema: await buildSchema({
       emitSchemaFile: true,
       resolvers: [UserResolver, ContainerResolver],
-      validate: false
+      validate: false,
     }),
     introspection: true,
     playground: IS_PROD ? false : true,
@@ -65,16 +65,18 @@ const main = async () => {
       }
       IS_PROD ? "" : console.log(error);
       return new ApolloError("Internal server error", "INTERNAL_SERVER_ERROR");
-    }
-  })
+    },
+  });
 
   apolloServer.applyMiddleware({
     app,
     path: "/graphql",
-    cors: false
+    cors: false,
   });
-  
-  app.listen(4000, () => console.log(`🚀 Server is online and ready @ http://localhost:4000/graphql`));
-}
+
+  app.listen(4000, () =>
+    console.log(`🚀 Server is online and ready @ http://localhost:4000/graphql`)
+  );
+};
 
 main().catch((err) => console.error(err));

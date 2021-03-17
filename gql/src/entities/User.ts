@@ -6,13 +6,13 @@ import {
   Enum,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryKey,
   Property,
   Unique,
 } from "@mikro-orm/core";
 import { Field, ObjectType } from "type-graphql";
 import { Container } from "./Container";
-
 
 @ObjectType()
 @Entity()
@@ -46,13 +46,16 @@ export class User {
   @Property({ type: "text", default: "''" })
   token?: string;
 
+  @Field()
   @Property({ type: "text", nullable: true })
   password?: string;
 
   @Property({ type: "text", nullable: true })
   emailCompleted?: boolean;
 
-  // @OneToMany(() => Container, c => c.user, { cascade: [Cascade.ALL] })
-  // @Field()
-  // containers = new Collection<Container>(this);
+  @Field(() => [Container])
+  @OneToMany(() => Container, (con: Container) => con.owner, {
+    cascade: [Cascade.ALL],
+  })
+  containers = new Collection<Container>(this);
 }

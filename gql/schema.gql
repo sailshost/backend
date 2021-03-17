@@ -5,9 +5,7 @@
 
 type Container {
   id: String!
-  name: String!
-  origin: String!
-  user: User!
+  origin: String
 }
 
 input ContainerInput {
@@ -49,10 +47,12 @@ input SignupInput {
 
 type User {
   code: String!
+  containers: [Container!]!
   createdAt: String!
   email: String!
   id: String!
   name: String!
+  password: String!
   token: String!
   updatedAt: String!
 }

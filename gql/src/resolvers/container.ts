@@ -16,6 +16,7 @@ import { isAuthed } from "../middleware/isAuthed";
 import { ContainerInput } from "../input/ContainerInput";
 import { FieldError } from "../entities/FieldError";
 import random from "project-name-generator";
+import { User } from "../entities/User";
 // MAKE YOUR OWN LIBRARY TO GEN RANDOM NAMES FOR PROJECTSSSSSSSSSSSSSSSSSSSSSSSSSSS
 
 @ObjectType()
@@ -28,31 +29,35 @@ class Response {
 export class ContainerResolver {
   @Mutation(() => Response)
   @UseMiddleware(isAuthed)
-  async createContainer (
+  async createContainer(
     @Arg("options") options: ContainerInput,
     @Ctx() ctx: MyCtx
   ): Promise<Response> {
     let container;
+
     try {
-      container = ctx.em.create(Container, {
-        id: v4(),
-        origin: random({ number: true }).dashed, 
-        name: options.name,
-        ownerID: ctx.req.session.userId
+      let userFetched = await ctx.em.findOne(User, {
+        id: ctx.req.session.userId,
       });
-    } catch(err) {
+
+      container = ctx.em.getRepository(Container).create({
+        id: v4(),
+        owner: userFetched,
+        origin: random({ number: true }).dashed,
+        name: options.name,
+      });
+    } catch (err) {
       return {
         errors: [
           {
             field: "Container",
-            message: `Unable to create container - ${err.stack}`
-          }
-        ]
-      }
+            message: `Unable to create container - ${err.stack}`,
+          },
+        ],
+      };
     }
 
-    ctx.em.persistAndFlush(container);
-
+    await ctx.em.persist(container).flush();
     return { container };
   }
 
@@ -63,16 +68,16 @@ export class ContainerResolver {
   ): Promise<Response> {
     let container;
     try {
-      container = await ctx.em.findOne(Container, { origin })
-    } catch(err) {
+      container = await ctx.em.getRepository(Container).findOne({ origin });
+    } catch (err) {
       return {
         errors: [
           {
             field: "Container",
-            message: `Unable to find that container - ${err.stack}`
-          }
-        ]
-      }
+            message: `Unable to find that container - ${err.stack}`,
+          },
+        ],
+      };
     }
 
     return { container };
