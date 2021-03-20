@@ -10,5 +10,5 @@ export default {
   },
   type: "postgresql",
   entities: [User, Container],
-  clientUrl: "postgresql://postgres:sails@localhost/sailsdev",
+  clientUrl: process.env.DATABASE_URL,
 } as Parameters<typeof MikroORM.init>[0];

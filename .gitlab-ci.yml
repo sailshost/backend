@@ -1,6 +1,57 @@
 stages:
   - build
+  - deploy
 
 build_image:
   variables:
-  
+      APP_NAME: sails-backend
+  ENVIRONMENT:
+    - IP=localhost
+    - NODE_ENV=production
+    - DATABASE_URL=$DATABASE_URL
+    - SENDGRID_API_KEY=$SENDGRID_API_KEY
+  image: docker
+  services:
+    - docker:dind
+  before_script:
+    - docker login registry.gitlab.com -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}
+  script:
+    - docker-compose up
+    - DOCKER_BUILDKIT=1 docker build -t $CI_COMMIT_SHORT_SHA .
+    - docker tag $CI_COMMIT_SHORT_SHA $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME:${CI_COMMIT_REF_SLUG}
+    - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME:${CI_COMMIT_REF_SLUG}
+  only:
+    - master
+    - develop
+
+
+deploy_develop:
+  stage: deploy
+  image: ubuntu
+  variables:
+    APP_NAME: sails-frontend
+    APP_PORT: 3000
+    CONTAINER_NAME: sails.host.frontend.${CI_COMMIT_REF_SLUG}
+  before_script:
+    - apt-get update -qq
+    - apt-get install -qq git
+    # Setup SSH deploy keys
+    - 'which ssh-agent || ( apt-get install -qq openssh-client )'
+    - eval $(ssh-agent -s)
+    - ssh-add <(echo "$SSH_PRIVATE_KEY")
+    - mkdir -p ~/.ssh
+    - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+  script:
+    # log into Docker registry
+    - ssh $VPS_NAME@$SAILS_IP "docker login registry.gitlab.com -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}"
+    # Remove image and stop container.
+    - ssh $VPS_NAME@$SAILS_IP "docker rmi $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME:${CI_COMMIT_REF_SLUG}" || true
+    - ssh $VPS_NAME@$SAILS_IP "docker pull $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME:${CI_COMMIT_REF_SLUG}" || true
+    - ssh $VPS_NAME@$SAILS_IP "docker stop $CONTAINER_NAME" || true
+    - ssh $VPS_NAME@$SAILS_IP "docker rm $CONTAINER_NAME" || true
+    # start new container
+    - ssh $VPS_NAME@$SAILS_IP "docker run --restart unless-stopped --name $CONTAINER_NAME -e NODE_ENV=production -p $APP_PORT:$APP_PORT -d $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME:${CI_COMMIT_REF_SLUG}"
+  only:
+    - develop
+
+

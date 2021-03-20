@@ -12,7 +12,7 @@ import { User } from "../entities/User";
 import { SignupInput } from "../input/SignupInput";
 import { MyCtx } from "../types";
 import { v4 } from "uuid";
-import { sendMail } from "@sails/shared";
+import { sendMail } from "../utils";
 import argon2 from "argon2";
 import { isAuthed } from "../middleware/isAuthed";
 import { CreatePasswordInput } from "../input/CreatePasswordInput";

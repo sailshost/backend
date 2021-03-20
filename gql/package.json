@@ -28,6 +28,7 @@
     "@mikro-orm/core": "^4.4.4",
     "@mikro-orm/postgresql": "^4.4.4",
     "@mikro-orm/reflection": "^4.4.4",
+    "@sendgrid/mail": "^7.4.2",
     "apollo-server": "^2.21.0",
     "apollo-server-express": "^2.21.0",
     "argon2": "^0.27.1",
