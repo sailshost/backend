@@ -1,4 +1,4 @@
-require('dotenv').config()
+require("dotenv").config();
 import "reflect-metadata";
 import { ApolloError, ApolloServer } from "apollo-server-express";
 import { MikroORM } from "@mikro-orm/core";
@@ -27,10 +27,13 @@ const main = async () => {
   app.use(
     cors({
       credentials: true,
-      origin: IS_PROD ? "https://sails.host" : "http://localhost:3000",
+      origin: IS_PROD
+        ? ["https://sails.host", "https://sailshost.com"]
+        : "http://localhost:3000",
     })
   );
 
+  // make my own implementation of this library to allow multiple domains
   app.use(
     session({
       name: SAILS_COOKIE,
@@ -62,7 +65,9 @@ const main = async () => {
       if (error.originalError instanceof ApolloError) {
         return error;
       }
+      // this should be a sentry log
       IS_PROD ? "" : console.log(error);
+      // this should report the sentry error code
       return new ApolloError("Internal server error", "INTERNAL_SERVER_ERROR");
     },
   });
@@ -74,7 +79,7 @@ const main = async () => {
   });
 
   app.listen(4000, () =>
-    console.log(`🚀 Server is online and ready @ http://localhost:4000/graphql`)
+    console.log("Server is online and ready @ http://localhost:4000/graphql")
   );
 };
 
