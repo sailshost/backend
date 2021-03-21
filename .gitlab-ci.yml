@@ -13,7 +13,6 @@ build_image:
   before_script:
     - docker login registry.gitlab.com -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}
   script:
-    - docker-compose up
     - DOCKER_BUILDKIT=1 docker build -t $CI_COMMIT_SHORT_SHA .
     - docker tag $CI_COMMIT_SHORT_SHA $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME:${CI_COMMIT_REF_SLUG}
     - docker push $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME:${CI_COMMIT_REF_SLUG}
@@ -38,8 +37,6 @@ deploy_develop:
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
-    - chmod +x ./setup.sh
-    - ./setup.sh
   script:
     # log into Docker registry
     - ssh $VPS_NAME@$SAILS_IP "docker login registry.gitlab.com -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}"
@@ -49,7 +46,7 @@ deploy_develop:
     - ssh $VPS_NAME@$SAILS_IP "docker stop $CONTAINER_NAME" || true
     - ssh $VPS_NAME@$SAILS_IP "docker rm $CONTAINER_NAME" || true
     # start new container
-    - ssh $VPS_NAME@$SAILS_IP "docker run --restart unless-stopped --name $CONTAINER_NAME -e -p $APP_PORT:$APP_PORT -d $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME:${CI_COMMIT_REF_SLUG}"
+    - ssh $VPS_NAME@$SAILS_IP "docker run --restart unless-stopped --name $CONTAINER_NAME -e NODE_ENV=production -e IP=localhost -e DATABASE_URL=$DATABASE_URL -e SENDGRID_API_KEY=$SENDGRID_API_KEY -p $APP_PORT:$APP_PORT -d $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME:${CI_COMMIT_REF_SLUG}"
   only:
     - develop
 
