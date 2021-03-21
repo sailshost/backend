@@ -5,8 +5,8 @@ services:
     image: sails/gql:latest
     #command: ["yarn", "yarn build", "yarn start"]
     #working_dir: ./gql
-    env_file:
-      ./gql/.env
+    #env_file:
+    #./gql/.env
     build:
       context: ./gql
       dockerfile: Dockerfile
