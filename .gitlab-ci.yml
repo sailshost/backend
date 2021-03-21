@@ -11,8 +11,6 @@ build_image:
   services:
     - docker:dind
   before_script:
-    - chmod +x ./setup.sh
-    - ./setup.sh
     - docker login registry.gitlab.com -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}
   script:
     - docker-compose up
@@ -40,6 +38,8 @@ deploy_develop:
     - ssh-add <(echo "$SSH_PRIVATE_KEY")
     - mkdir -p ~/.ssh
     - '[[ -f /.dockerenv ]] && echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config'
+    - chmod +x ./setup.sh
+    - ./setup.sh
   script:
     # log into Docker registry
     - ssh $VPS_NAME@$SAILS_IP "docker login registry.gitlab.com -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}"
