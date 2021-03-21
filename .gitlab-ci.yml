@@ -29,7 +29,7 @@ deploy_develop:
   image: ubuntu
   variables:
     APP_NAME: sails-backend
-    APP_PORT:
+    APP_PORT: 4000
     CONTAINER_NAME: sails.host.frontend.${CI_COMMIT_REF_SLUG}
   before_script:
     - apt-get update -qq
