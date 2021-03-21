@@ -1,10 +1,12 @@
+
 stages:
   - build
   - deploy
 
 build_image:
   variables:
-      APP_NAME: sails-backend
+    APP_NAME: sails-backend
+  stage: build
   image: docker
   services:
     - docker:dind
@@ -27,7 +29,7 @@ deploy_develop:
   image: ubuntu
   variables:
     APP_NAME: sails-backend
-    APP_PORT: 4000
+    APP_PORT:
     CONTAINER_NAME: sails.host.frontend.${CI_COMMIT_REF_SLUG}
   before_script:
     - apt-get update -qq
