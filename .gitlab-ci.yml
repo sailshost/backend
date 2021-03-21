@@ -11,7 +11,7 @@ build_image:
   services:
     - docker:dind
   before_script:
-    - chomod +x ./setup.sh
+    - chmod +x ./setup.sh
     - ./setup.sh
     - docker login registry.gitlab.com -u ${CI_REGISTRY_USER} -p ${CI_REGISTRY_PASSWORD}
   script:
