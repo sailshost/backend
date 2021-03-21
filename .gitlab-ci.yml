@@ -20,7 +20,6 @@ build_image:
     - master
     - develop
 
-
 deploy_develop:
   stage: deploy
   image: ubuntu
@@ -49,5 +48,4 @@ deploy_develop:
     - ssh $VPS_NAME@$SAILS_IP "docker run --restart unless-stopped --name $CONTAINER_NAME -e NODE_ENV=production -e IP=localhost -e DATABASE_URL=$DATABASE_URL -e SENDGRID_API_KEY=$SENDGRID_API_KEY -p $APP_PORT:$APP_PORT -d $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME:${CI_COMMIT_REF_SLUG}"
   only:
     - develop
-
 
