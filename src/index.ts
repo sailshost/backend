@@ -1,5 +1,5 @@
+require('dotenv').config()
 import "reflect-metadata";
-import "dotenv-safe/config";
 import { ApolloError, ApolloServer } from "apollo-server-express";
 import { MikroORM } from "@mikro-orm/core";
 import express from "express";
@@ -13,7 +13,6 @@ import session from "express-session";
 import { UserResolver } from "./resolvers/user";
 import { IS_PROD, SAILS_COOKIE } from "./constants";
 import { ContainerResolver } from "./resolvers/container";
-require("dotenv-safe").config();
 
 const app = express();
 
