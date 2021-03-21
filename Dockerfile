@@ -4,8 +4,6 @@ WORKDIR /gql
 
 copy package*.json ./
 
-# RUN npm install -g yarn
-
 COPY . .
 
 RUN yarn

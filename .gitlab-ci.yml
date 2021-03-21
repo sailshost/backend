@@ -26,8 +26,8 @@ deploy_develop:
   stage: deploy
   image: ubuntu
   variables:
-    APP_NAME: sails-frontend
-    APP_PORT: 3000
+    APP_NAME: sails-backend
+    APP_PORT: 4000
     CONTAINER_NAME: sails.host.frontend.${CI_COMMIT_REF_SLUG}
   before_script:
     - apt-get update -qq
@@ -47,7 +47,7 @@ deploy_develop:
     - ssh $VPS_NAME@$SAILS_IP "docker stop $CONTAINER_NAME" || true
     - ssh $VPS_NAME@$SAILS_IP "docker rm $CONTAINER_NAME" || true
     # start new container
-    - ssh $VPS_NAME@$SAILS_IP "docker run --restart unless-stopped --name $CONTAINER_NAME -e NODE_ENV=production -p $APP_PORT:$APP_PORT -d $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME:${CI_COMMIT_REF_SLUG}"
+    - ssh $VPS_NAME@$SAILS_IP "docker run --restart unless-stopped --name $CONTAINER_NAME -e -p $APP_PORT:$APP_PORT -d $CI_REGISTRY/$CI_PROJECT_NAMESPACE/$CI_PROJECT_NAME/$CI_COMMIT_REF_NAME:${CI_COMMIT_REF_SLUG}"
   only:
     - develop
 
