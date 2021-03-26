@@ -10,5 +10,5 @@ export default {
   },
   type: "postgresql",
   entities: [User, Container],
-  clientUrl: process.env.DATABASE_URL,
+  clientUrl: process.env.DATABASE_URL as string,
 } as Parameters<typeof MikroORM.init>[0];

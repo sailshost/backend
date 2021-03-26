@@ -2,8 +2,8 @@
 
 echo "Running setup script"
 
-echo IP=localhost >> .env
-echo DATABASE_URL=postgresql://postgres:testing123@localhost/develop >> .env
+echo REDIS_URL=redis://:auth@127.0.0.1:6380/0 >> .env
+echo DATABASE_URL=postgresql://postgres:testing123@127.0.0.1/develop >> .env
 echo SENDGRID_API_KEY= >> .env
 
 echo " "

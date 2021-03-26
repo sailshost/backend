@@ -21,8 +21,10 @@ const main = async () => {
   await orm.getMigrator().up();
 
   const RedisStore = connectRedis(session);
-  const redisClient = Redis.createClient({ host: process.env.IP as string });
-  const redis = new ioredis({ host: process.env.IP as string });
+  const redisClient = Redis.createClient({
+    url: process.env.REDIS_URL as string,
+  });
+  const redis = new ioredis(process.env.REDIS_URL as string);
 
   app.use(
     cors({
