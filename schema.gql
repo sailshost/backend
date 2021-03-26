@@ -32,7 +32,7 @@ type Mutation {
 
 type Query {
   getContainer(origin: String!): Response!
-  me: User!
+  me: User
 }
 
 type Response {

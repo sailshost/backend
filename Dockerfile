@@ -1,14 +1,14 @@
 from node:latest
 
-WORKDIR /gql
+WORKDIR /usr/app/backend
 
 copy package*.json ./
 
 COPY . .
 
-RUN yarn
-
-RUN yarn build
+RUN yarn \
+&& yarn build \
+&& yarn --production
 
 EXPOSE 4000
 

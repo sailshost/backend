@@ -27,7 +27,7 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
-  @Query(() => User)
+  @Query(() => User, { nullable: true })
   @UseMiddleware(isAuthed)
   async me(@Ctx() ctx: MyCtx): Promise<User> {
     if (!ctx.req.session.userId) {
