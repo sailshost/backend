@@ -22,9 +22,9 @@ const main = async () => {
 
   const RedisStore = connectRedis(session);
   const redisClient = Redis.createClient({
-    url: process.env.REDIS_URL as string,
+    host: process.env.REDIS_IP as string,
   });
-  const redis = new ioredis(process.env.REDIS_URL as string);
+  const redis = new ioredis({ host: process.env.REDIS_IP as string });
 
   app.use(
     cors({

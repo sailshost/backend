@@ -1,8 +1,8 @@
 declare namespace NodeJS {
   export interface ProcessEnv {
-    IS_PROD: boolean;
+    REDIS_IP: string;
     DATABASE_URL: string;
-    IP: string,
+    NODE_ENV: string;
     SENDGRID_API_KEY: string;
   }
 }
