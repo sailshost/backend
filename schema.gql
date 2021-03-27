@@ -23,16 +23,22 @@ type FieldError {
   message: String!
 }
 
+input LoginInput {
+  email: String!
+  password: String!
+}
+
 type Mutation {
   createContainer(options: ContainerInput!): Response!
   createPassword(options: CreatePasswordInput!): UserResponse!
+  login(options: LoginInput!): UserResponse!
   resendEmail(email: String!): UserResponse!
   signup(options: SignupInput!): UserResponse!
 }
 
 type Query {
   getContainer(origin: String!): Response!
-  me: User
+  me: UserResponse
 }
 
 type Response {

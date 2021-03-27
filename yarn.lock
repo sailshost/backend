@@ -56,6 +56,11 @@
     is-absolute "^1.0.0"
     is-negated-glob "^1.0.0"
 
+"@giraphql/core@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@giraphql/core/-/core-2.0.2.tgz#fbf8b1aff791ec04809c16f30a444f7d7adcb8e6"
+  integrity sha512-+pUGmszFBtzsw6dyCHNsVqeZ0hOC2Vuo5nZA02A51CVnhhwwykFkhERoOWoJonl1wkpUW7Yzn4ErQP+z315fLw==
+
 "@mikro-orm/cli@^4.4.4":
   version "4.4.4"
   resolved "https://registry.yarnpkg.com/@mikro-orm/cli/-/cli-4.4.4.tgz#bb09a134f71741ff43789bae5096ac0f6cce2ecf"

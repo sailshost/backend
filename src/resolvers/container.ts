@@ -46,6 +46,8 @@ export class ContainerResolver {
         origin: random({ number: true }).dashed,
         name: options.name,
       });
+
+      // create docker container & auto deploy
     } catch (err) {
       return {
         errors: [
@@ -57,7 +59,7 @@ export class ContainerResolver {
       };
     }
 
-    await ctx.em.persist(container).flush();
+    await ctx.em.persistAndFlush(container);
     return { container };
   }
 

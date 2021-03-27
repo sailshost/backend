@@ -10,6 +10,7 @@ import {
 } from "type-graphql";
 import { User } from "../entities/User";
 import { SignupInput } from "../input/SignupInput";
+import { LoginInput } from "../input/LoginInput";
 import { MyCtx } from "../types";
 import { v4 } from "uuid";
 import { sendMail } from "../utils";
@@ -27,18 +28,25 @@ class UserResponse {
 
 @Resolver()
 export class UserResolver {
-  @Query(() => User, { nullable: true })
+  @Query(() => UserResponse, { nullable: true })
   @UseMiddleware(isAuthed)
-  async me(@Ctx() ctx: MyCtx): Promise<User> {
+  async me(@Ctx() ctx: MyCtx): Promise<UserResponse> {
     if (!ctx.req.session.userId) {
-      return null;
+      return {
+        errors: [
+          {
+            field: "user",
+            message: "test",
+          },
+        ],
+      };
     }
     let user;
     try {
       user = await ctx.em.findOne(User, { id: ctx.req.session.userId });
     } catch (err) {}
 
-    return user;
+    return { user };
   }
 
   @Mutation(() => UserResponse)
@@ -57,6 +65,8 @@ export class UserResolver {
       const token = v4();
 
       await ctx.redis.set(`password:${token}`, user.id, "ex", 86400000);
+
+      console.log(`password:${token}`);
 
       user.token = token;
 
@@ -85,6 +95,56 @@ export class UserResolver {
     }
 
     ctx.em.persistAndFlush(user);
+
+    return { user };
+  }
+
+  @Mutation(() => UserResponse)
+  async login(
+    @Arg("options") options: LoginInput,
+    @Ctx() ctx: MyCtx
+  ): Promise<UserResponse> {
+    let user;
+    try {
+      user = await ctx.em.findOne(User, {
+        email: options.email,
+      });
+      if (!user)
+        return {
+          errors: [
+            {
+              field: "email",
+              message: "We were unable to find that email in our records.",
+            },
+          ],
+        };
+
+      // TODO: CHANGE TO SECURE-PASSWORD PACKAGE
+      const valid = await argon2.verify(user.password, options.password);
+      if (!valid) {
+        return {
+          errors: [
+            {
+              field: "password",
+              message: "Make better password noob",
+            },
+          ],
+        };
+      }
+    } catch (err) {
+      // if (err.code === "23505") {
+      return {
+        errors: [
+          {
+            field: "unknown",
+            message: `Something went wrong - ${err.stack}`,
+          },
+        ],
+      };
+      // }
+    }
+
+    ctx.req.session.userId = user.id;
 
     return { user };
   }
@@ -144,6 +204,7 @@ export class UserResolver {
       };
     }
 
+    // TODO: CHANGE TO SECURE-PASSWORD PACKAGE
     user.password = await argon2.hash(options.password);
 
     await ctx.em.persistAndFlush(user);
