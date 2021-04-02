@@ -30,7 +30,7 @@ const main = async () => {
     cors({
       credentials: true,
       origin: IS_PROD
-        ? ["https://sails.host", "https://sailshost.com"]
+        ? ["https://sails.host", "https://sailshost.com", "http://localhost:3000"]
         : "http://localhost:3000",
     })
   );
