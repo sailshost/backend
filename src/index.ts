@@ -30,7 +30,7 @@ const main = async () => {
     cors({
       credentials: true,
       origin: IS_PROD
-        ? ["https://sails.host", "https://sailshost.com", "http://localhost:3000"]
+        ? ["https://sails.host", "https://sailshost.com", "https://dev.sails.host"]
         : "http://localhost:3000",
     })
   );
@@ -44,10 +44,8 @@ const main = async () => {
         maxAge: 1000 * 60 * 60 * 24 * 365 * 10,
         httpOnly: true,
         sameSite: "lax",
-        //secure: IS_PROD ? true : false,
-        //domain: IS_PROD ? ".sails.host" : undefined,
-        secure: false,
-        domain: undefined,
+        secure: IS_PROD ? true : false,
+        domain: IS_PROD ? ".sails.host" : undefined,
       },
       saveUninitialized: false,
       secret: SAILS_COOKIE,
