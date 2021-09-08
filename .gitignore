@@ -9,3 +9,5 @@ node_modules
 
 # idk 
 dump.rdb
+.yarn
+.yarnrc
