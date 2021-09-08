@@ -7,9 +7,9 @@ copy yarn.lock ./
 COPY . ./
 
 RUN yarn \
+&& yarn prisma generate \
 && yarn build \
-&& yarn --production \
-&& yarn prisma generate
+&& yarn --production
 
 EXPOSE 4000
 
