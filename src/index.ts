@@ -11,7 +11,7 @@ import connectRedis from "connect-redis";
 import { createGraphQLContext } from "./schemas/builder";
 
 const app = express();
-const port = 2000 | (process.env.PORT as unknown as number);
+const port = 4000 | (process.env.PORT as unknown as number);
 
 const start = async () => {
   const RedisStore = connectRedis(session);
