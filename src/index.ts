@@ -16,9 +16,9 @@ const port = 2000 | (process.env.PORT as unknown as number);
 const start = async () => {
   const RedisStore = connectRedis(session);
 
-  const redisClient = Redis.createClient();
+  const redisClient = Redis.createClient({ host: "localhost" });
 
-  const redis = new ioredis();
+  const redis = new ioredis({ host: "localhost" });
 
   app.use(
     session({
