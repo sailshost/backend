@@ -9,6 +9,7 @@ import Redis from "redis";
 import ioredis from "ioredis";
 import connectRedis from "connect-redis";
 import { createGraphQLContext } from "./schemas/builder";
+import { ApolloServerPluginLandingPageDisabled } from "apollo-server-core";
 
 const app = express();
 const port = 4000 | (process.env.PORT as unknown as number);
@@ -55,6 +56,7 @@ const start = async () => {
     schema,
     // @ts-ignore
     context: ({ req, res }) => createGraphQLContext(req, res, session, redis),
+    plugins: IS_PROD ? [ApolloServerPluginLandingPageDisabled()] : [],
   });
 
   await server.start();
