@@ -8,6 +8,7 @@ COPY . ./
 
 RUN yarn \
 && yarn prisma generate \
+&& yarn pisma migrate deploy \
 && yarn build \
 && yarn --production
 
