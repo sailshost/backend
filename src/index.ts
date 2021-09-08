@@ -53,6 +53,7 @@ const start = async () => {
 
   const server = new ApolloServer({
     schema,
+    // @ts-ignore
     context: ({ req, res }) => createGraphQLContext(req, res, session, redis),
   });
 

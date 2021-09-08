@@ -40,7 +40,6 @@ export const builder = new SchemaBuilder<{
     public: boolean;
     user: boolean;
     unauthenticated: boolean;
-    isStaff: boolean;
   };
 }>({
   plugins: [PrismaPlugin, ValidationPlugin, ScopeAuthPlugin],
