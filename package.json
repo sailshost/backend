@@ -12,7 +12,8 @@
     "prisma:gen": "npx prisma generate && npx prisma migrate dev",
     "prisma:seed": "ts-node prisma/seed.ts",
     "build": "tsc --noEmit",
-    "dev": "nodemon --transpile-only src/index.ts"
+    "dev": "nodemon --transpile-only src/index.ts",
+    "start": "node ./dist/index.js"
   },
   "devDependencies": {
     "@types/argon2": "^0.15.0",

@@ -8,7 +8,8 @@ COPY . ./
 
 RUN yarn \
 && yarn build \
-&& yarn --production
+&& yarn --production \
+&& yarn prisma generate
 
 EXPOSE 4000
 
