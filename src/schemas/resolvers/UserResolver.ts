@@ -1,23 +1,44 @@
-import { AuthenticationError } from "apollo-server";
-import { builder, Context } from "../builder";
+import { AuthenticationError, ValidationError } from "apollo-server";
+import { builder } from "../builder";
 import { prisma } from "../prisma";
-import { SignupInput } from "./SignupInput";
+import { SignupInput, LoginInput } from "../inputs";
 import argon from "argon2";
-import { LoginInput } from "./LoginInput";
 
 builder.prismaObject("User", {
   findUnique: (user) => ({ id: user.id }),
   fields: (t) => ({
     id: t.exposeID("id"),
+    createdAt: t.expose("createdAt", { type: "DateTime" }),
+    updatedAt: t.expose("updatedAt", { type: "DateTime" }),
   }),
 });
+
+builder.queryField("me", (t) =>
+  t.prismaField({
+    type: "User",
+    nullable: true,
+    skipTypeScopes: true,
+    grantScopes: ["currentUser"],
+    resolve: async (query, root, args, ctx) => {
+      if (!ctx.req.session?.userId) {
+        return null;
+      }
+
+      return await prisma.user.findUnique({
+        ...query,
+        where: { id: ctx.req.session.userId },
+        rejectOnNotFound: true,
+      });
+    },
+  })
+);
 
 builder.mutationField("signup", (t) =>
   t.prismaField({
     type: "User",
     skipTypeScopes: true,
     authScopes: {
-      public: true,
+      unauthenticated: true,
     },
     args: {
       input: t.arg({ type: SignupInput }),
@@ -58,7 +79,10 @@ builder.mutationField("login", (t) =>
     args: {
       input: t.arg({ type: LoginInput }),
     },
-    resolve: async (query, root, { input }, ctx) => {
+    // errors: {
+    //   types: [ValidationError]
+    // },
+    resolve: async (_query, _root, { input }, ctx) => {
       if (!input?.email || !input?.password)
         throw new AuthenticationError("missings_credentials");
 
@@ -73,6 +97,7 @@ builder.mutationField("login", (t) =>
       if (!valid) throw new AuthenticationError("invalid_credentials");
 
       ctx.req.session.userId = user.id;
+      console.log(ctx.req.session);
 
       return user;
     },
@@ -81,6 +106,6 @@ builder.mutationField("login", (t) =>
 
 builder.queryField("test", (t) =>
   t.string({
-    resolve: () => "Test mutation",
+    resolve: () => "Test query",
   })
 );

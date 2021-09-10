@@ -11,6 +11,7 @@ type Mutation {
 }
 
 type Query {
+  me: User
   test: String!
 }
 
@@ -22,5 +23,7 @@ input SignupInput {
 }
 
 type User {
+  createdAt: DateTime!
   id: ID!
+  updatedAt: DateTime!
 }

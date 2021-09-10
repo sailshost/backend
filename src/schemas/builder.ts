@@ -1,4 +1,4 @@
-import SchemaBuilder, { contextCacheSymbol } from "@giraphql/core";
+import SchemaBuilder from "@giraphql/core";
 import { Request, Response } from "express";
 import { prisma } from "./prisma";
 import { Session } from "@prisma/client";
@@ -6,7 +6,11 @@ import PrismaPlugin from "@giraphql/plugin-prisma";
 import PrismaTypes from "../../prisma/giraphql-types";
 import ValidationPlugin from "@giraphql/plugin-validation";
 import ScopeAuthPlugin from "@giraphql/plugin-scope-auth";
+import RelayPlugin from "@giraphql/plugin-relay";
+import ErrorsPlugin from "@giraphql/plugin-errors";
 import { Redis } from "ioredis";
+import { ValidationError } from "apollo-server-errors";
+import { NotFoundError } from "./errors";
 
 export interface Context {
   req: Request & { session: { userId: string } };
@@ -42,7 +46,16 @@ export const builder = new SchemaBuilder<{
     unauthenticated: boolean;
   };
 }>({
-  plugins: [PrismaPlugin, ValidationPlugin, ScopeAuthPlugin],
+  plugins: [PrismaPlugin, ValidationPlugin, ScopeAuthPlugin, RelayPlugin, ErrorsPlugin],
+  // errorOptions: {
+  //   defaultTypes: [ValidationError, NotFoundError],
+  // },
+  relayOptions: {
+    nodeFieldOptions: {},
+    nodeQueryOptions: {},
+    nodeTypeOptions: {},
+    pageInfoFieldOptions: {},
+  },
   prisma: {
     client: prisma,
   },
@@ -53,7 +66,9 @@ export const builder = new SchemaBuilder<{
   }),
 });
 
-builder.queryType({});
+builder.queryType({
+  authScopes: { user: true },
+});
 builder.mutationType({
   authScopes: { user: true },
 });

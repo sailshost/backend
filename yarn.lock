@@ -506,12 +506,22 @@
   resolved "https://registry.yarnpkg.com/@giraphql/core/-/core-2.15.1.tgz#8a5632742500385a3b346f14f4c404f0c6df6222"
   integrity sha512-MAkeUL3pBAg34LD+3oFxBGvoPOc+rNcXUDl40LfcZojDfrnKqgPqH2vKApiOD++/0SPdHooIlUYp+rZ1lu+e3g==
 
+"@giraphql/plugin-errors@^2.8.1":
+  version "2.8.1"
+  resolved "https://registry.yarnpkg.com/@giraphql/plugin-errors/-/plugin-errors-2.8.1.tgz#26612d77ae172b3b61400688b1d29cbf30fd1df8"
+  integrity sha512-dPgKoIdg+9k+735AFsore65e8kNpUDMz2yX/r4Dkslg0lM9ztuaS66WkS8/TX2c1lus7F1+wf9rC4/hexeUlXw==
+
 "@giraphql/plugin-prisma@^0.9.1":
   version "0.9.1"
   resolved "https://registry.yarnpkg.com/@giraphql/plugin-prisma/-/plugin-prisma-0.9.1.tgz#f43bded738fb23b0a2e5dea55a95187905f27874"
   integrity sha512-fun86JCP5rvJLZ/u6C78CqRH07WZ5z5gjXvn1rrWe0AALaQvo4za/fTsq5kmgnLkJmG49dvzwuX0KP+/PKxCMA==
   dependencies:
     "@prisma/generator-helper" "^2.30.0"
+
+"@giraphql/plugin-relay@^2.15.1":
+  version "2.15.1"
+  resolved "https://registry.yarnpkg.com/@giraphql/plugin-relay/-/plugin-relay-2.15.1.tgz#c22f7ed232b8eafd6f1e609bb2432ccc108f9d03"
+  integrity sha512-E0H7NR5TgBcW/uRcyNoVdWiB+blkpdl3oC3n9z8rMkhJGwyQFh+kPgAnuPeTHe/k/6dL3h0vB8tnu3C1yaQ/MA==
 
 "@giraphql/plugin-scope-auth@^2.10.1":
   version "2.10.1"

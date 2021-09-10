@@ -2,7 +2,7 @@ import { builder } from "./builder";
 import path from "path";
 import fs from "fs";
 import { printSchema, lexicographicSortSchema } from "graphql";
-import "./user";
+import "./resolvers";
 
 const schema = builder.toSchema({});
 const schemaAsString = printSchema(lexicographicSortSchema(schema));

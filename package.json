@@ -31,7 +31,9 @@
   },
   "dependencies": {
     "@giraphql/core": "^2.15.1",
+    "@giraphql/plugin-errors": "^2.8.1",
     "@giraphql/plugin-prisma": "^0.9.1",
+    "@giraphql/plugin-relay": "^2.15.1",
     "@giraphql/plugin-scope-auth": "^2.10.1",
     "@giraphql/plugin-validation": "^2.10.1",
     "@graphql-codegen/cli": "^2.1.1",

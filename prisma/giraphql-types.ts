@@ -25,7 +25,7 @@ export default interface PrismaTypes {
         ListRelations: never;
         Relations: {
             user: {
-                Shape: User;
+                Shape: User | null;
                 Types: PrismaTypes["User"];
             };
         };
