@@ -17,9 +17,6 @@
   },
   "devDependencies": {
     "@types/argon2": "^0.15.0",
-    "@types/connect-redis": "^0.0.17",
-    "@types/express-session": "^1.17.4",
-    "@types/ioredis": "^4.27.2",
     "@types/node": "^16.7.10",
     "@types/redis": "^2.8.32",
     "dotenv": "^10.0.0",
@@ -45,10 +42,9 @@
     "apollo-server": "^3.3.0",
     "apollo-server-core": "^3.3.0",
     "argon2": "^0.28.2",
-    "connect-redis": "^6.0.0",
-    "express-session": "^1.17.2",
+    "date-fns": "^2.23.0",
     "graphql": "^15.5.2",
-    "ioredis": "^4.27.9",
+    "next-iron-session": "^4.2.0",
     "redis": "^3.1.2",
     "zod": "^3.8.2"
   }

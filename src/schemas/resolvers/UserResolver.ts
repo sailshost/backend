@@ -3,6 +3,7 @@ import { builder } from "../builder";
 import { prisma } from "../prisma";
 import { SignupInput, LoginInput } from "../inputs";
 import argon from "argon2";
+import { createSession } from "../../utils/session";
 
 builder.prismaObject("User", {
   findUnique: (user) => ({ id: user.id }),
@@ -19,14 +20,15 @@ builder.queryField("me", (t) =>
     nullable: true,
     skipTypeScopes: true,
     grantScopes: ["currentUser"],
-    resolve: async (query, root, args, ctx) => {
-      if (!ctx.req.session?.userId) {
+    resolve: async (query, _root, _args, { session }) => {
+      console.log(session);
+      if (!session?.userId) {
         return null;
       }
 
       return await prisma.user.findUnique({
         ...query,
-        where: { id: ctx.req.session.userId },
+        where: { id: session.userId },
         rejectOnNotFound: true,
       });
     },
@@ -38,16 +40,17 @@ builder.mutationField("signup", (t) =>
     type: "User",
     skipTypeScopes: true,
     authScopes: {
-      unauthenticated: true,
+      public: true,
     },
     args: {
       input: t.arg({ type: SignupInput }),
     },
-    resolve: async (query, root, { input }, ctx) => {
+    resolve: async (query, _root, { input }, ctx) => {
       if (!input?.email || !input?.password)
         throw new AuthenticationError("missings_credentials");
 
       const user = await prisma.user.findUnique({
+        ...query,
         where: { email: input.email },
       });
 
@@ -61,8 +64,6 @@ builder.mutationField("signup", (t) =>
           password: hash,
         },
       });
-
-      ctx.req.session.userId = account.id;
 
       return account;
     },
@@ -82,11 +83,12 @@ builder.mutationField("login", (t) =>
     // errors: {
     //   types: [ValidationError]
     // },
-    resolve: async (_query, _root, { input }, ctx) => {
+    resolve: async (query, _root, { input }, { req }) => {
       if (!input?.email || !input?.password)
         throw new AuthenticationError("missings_credentials");
 
       const user = await prisma.user.findUnique({
+        ...query,
         where: { email: input.email },
       });
 
@@ -96,8 +98,7 @@ builder.mutationField("login", (t) =>
 
       if (!valid) throw new AuthenticationError("invalid_credentials");
 
-      ctx.req.session.userId = user.id;
-      console.log(ctx.req.session);
+      await createSession(req, user);
 
       return user;
     },

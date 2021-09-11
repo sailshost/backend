@@ -1,35 +1,31 @@
 import SchemaBuilder from "@giraphql/core";
 import { Request, Response } from "express";
 import { prisma } from "./prisma";
-import { Session } from "@prisma/client";
+import { Session, User } from "@prisma/client";
 import PrismaPlugin from "@giraphql/plugin-prisma";
 import PrismaTypes from "../../prisma/giraphql-types";
 import ValidationPlugin from "@giraphql/plugin-validation";
 import ScopeAuthPlugin from "@giraphql/plugin-scope-auth";
 import RelayPlugin from "@giraphql/plugin-relay";
 import ErrorsPlugin from "@giraphql/plugin-errors";
-import { Redis } from "ioredis";
 import { ValidationError } from "apollo-server-errors";
 import { NotFoundError } from "./errors";
 
 export interface Context {
-  req: Request & { session: { userId: string } };
+  req: Request;
   res: Response;
   session?: Session | null;
-  redis?: Redis;
 }
 
 export function createGraphQLContext(
-  request: Request & { session: { userId: string } },
+  req: Request,
   res: Response,
-  session?: Session | null,
-  redis?: Redis
+  session?: Session | null
 ): Context {
   return {
-    req: request,
+    req,
     res,
     session,
-    redis,
   };
 }
 
@@ -46,7 +42,13 @@ export const builder = new SchemaBuilder<{
     unauthenticated: boolean;
   };
 }>({
-  plugins: [PrismaPlugin, ValidationPlugin, ScopeAuthPlugin, RelayPlugin, ErrorsPlugin],
+  plugins: [
+    PrismaPlugin,
+    ValidationPlugin,
+    ScopeAuthPlugin,
+    RelayPlugin,
+    ErrorsPlugin,
+  ],
   // errorOptions: {
   //   defaultTypes: [ValidationError, NotFoundError],
   // },
