@@ -52,12 +52,12 @@ export async function createSession(
   return session;
 }
 
-export async function destroySession(req: Request, user: User) {
+export async function destroySession(req: Request, session: Session) {
   const requestWithSession = req as unknown as RequestWithSession;
 
   requestWithSession.session.destroy();
 
-  await prisma.session.delete({ where: { id: user?.id } });
+  await prisma.session.delete({ where: { id: session?.id } });
 }
 
 export async function getSession(req: Request, res: Response) {

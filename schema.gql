@@ -28,7 +28,9 @@ input SignupInput {
 }
 
 type User {
+  avatar: String
   createdAt: DateTime!
   id: ID!
+  name: String
   updatedAt: DateTime!
 }

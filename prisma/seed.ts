@@ -1,27 +1,46 @@
 import { PrismaClient } from "@prisma/client";
 import argon from "argon2";
+import { IS_PROD } from "../src/export";
 const prisma = new PrismaClient();
 
 async function main() {
-  await prisma.user.deleteMany();
-  console.log("Deleted all users");
+  if (IS_PROD) {
+    console.log("Running seed in production is not recommended");
+  } else {
+    await prisma.user.deleteMany();
 
-  const password = await argon.hash("uwu");
-  const password2 = await argon.hash("imposedisdaddy");
+    const email = "@sails.host";
+    const one = `kyle${email}`;
+    const two = `andre${email}`;
+    const pass = "ZP4SuLAtnbXJ42GEqGZvH";
+    const pass2 = "dX8ZDAtFoG28renQC8pwH";
+    const password = await argon.hash(pass);
+    const password2 = await argon.hash(pass2);
 
-  await prisma.user.create({
-    data: {
-      email: "kyle@sails.host",
-      password: password,
-    },
-  });
-  await prisma.user.create({
-    data: {
-      email: "andre@sails.host",
-      password: password2,
-    },
-  });
-  return console.log("Created users");
+    await prisma.user.createMany({
+      data: [
+        {
+          email: one,
+          password: password,
+          name: "Kyle Bennett",
+          avatar: "https://avatar.tobi.sh/kyle.jpg",
+          isStaff: true,
+        },
+        {
+          email: two,
+          password: password2,
+          name: "Andre",
+          avatar: "https://avatar.tobi.sh/andre.jpg",
+          isStaff: true,
+        },
+      ],
+      skipDuplicates: true,
+    });
+    return console.log(`Created users --->
+${one}:${pass}
+
+${two}:${pass2}`);
+  }
 }
 
 main()

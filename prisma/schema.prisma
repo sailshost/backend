@@ -16,6 +16,7 @@ generator giraphql {
 model User {
   id               String      @id @default(cuid())
   name             String?
+  avatar           String?
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
   email            String      @unique
@@ -23,6 +24,7 @@ model User {
   token            String?
   password         String
   emailedCompleted Boolean     @default(false)
+  isStaff          Boolean     @default(false)
   Session          Session[]
   Containers       Container[]
 }
