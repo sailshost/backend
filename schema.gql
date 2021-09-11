@@ -1,3 +1,7 @@
+input AccountInput {
+  name: String
+}
+
 scalar DateTime
 
 input LoginInput {
@@ -6,13 +10,14 @@ input LoginInput {
 }
 
 type Mutation {
+  edit(input: AccountInput): User!
   login(input: LoginInput): User!
   signup(input: SignupInput): User!
 }
 
 type Query {
+  logout: User!
   me: User
-  test: String!
 }
 
 input SignupInput {

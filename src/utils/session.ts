@@ -23,8 +23,8 @@ export const sessionOptions: SessionOptions = {
   ],
   cookieName: SAILS_COOKIE,
   cookieOptions: {
-    secure: IS_PROD ? true : false,
-    sameSite: "lax",
+    secure: true, //IS_PROD ? true : false,
+    sameSite: "none",
     httpOnly: true,
   },
 };
@@ -33,10 +33,12 @@ export async function createSession(
   req: Request,
   user: User
 ): Promise<void | unknown> {
+  const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
   const session = await prisma.session.create({
     data: {
       userId: user.id,
       expiresAt: addSeconds(new Date(), SESSION_TTL),
+      ip: ip as any,
     },
   });
 

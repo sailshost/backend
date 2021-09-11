@@ -1,4 +1,4 @@
-from node:lts-alpine
+from sails_api_depen:latest
 
 WORKDIR /usr/sails/backend
 
@@ -6,11 +6,9 @@ copy yarn.lock ./
 
 COPY . ./
 
-RUN yarn \
-&& yarn prisma generate \
+RUN yarn prisma generate \
 && yarn prisma migrate deploy \
-&& yarn build \
-&& yarn --production
+&& yarn build 
 
 EXPOSE 4000
 

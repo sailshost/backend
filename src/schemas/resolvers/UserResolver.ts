@@ -3,12 +3,14 @@ import { builder } from "../builder";
 import { prisma } from "../prisma";
 import { SignupInput, LoginInput } from "../inputs";
 import argon from "argon2";
-import { createSession } from "../../utils/session";
+import { createSession, destroySession, getSession } from "../../utils/session";
+import { AccountInput } from "../inputs/AccountInput";
 
 builder.prismaObject("User", {
   findUnique: (user) => ({ id: user.id }),
   fields: (t) => ({
     id: t.exposeID("id"),
+    //name: t.exposeString(),
     createdAt: t.expose("createdAt", { type: "DateTime" }),
     updatedAt: t.expose("updatedAt", { type: "DateTime" }),
   }),
@@ -21,7 +23,6 @@ builder.queryField("me", (t) =>
     skipTypeScopes: true,
     grantScopes: ["currentUser"],
     resolve: async (query, _root, _args, { session }) => {
-      console.log(session);
       if (!session?.userId) {
         return null;
       }
@@ -40,7 +41,7 @@ builder.mutationField("signup", (t) =>
     type: "User",
     skipTypeScopes: true,
     authScopes: {
-      public: true,
+      unauthenticated: false,
     },
     args: {
       input: t.arg({ type: SignupInput }),
@@ -75,7 +76,7 @@ builder.mutationField("login", (t) =>
     type: "User",
     skipTypeScopes: true,
     authScopes: {
-      public: true,
+      unauthenticated: false,
     },
     args: {
       input: t.arg({ type: LoginInput }),
@@ -105,8 +106,51 @@ builder.mutationField("login", (t) =>
   })
 );
 
-builder.queryField("test", (t) =>
-  t.string({
-    resolve: () => "Test query",
+builder.mutationField("edit", (t) =>
+  t.prismaField({
+    type: "User",
+    skipTypeScopes: true,
+    authScopes: {
+      user: true,
+      $granted: "currentUser",
+    },
+    args: {
+      input: t.arg({ type: AccountInput }),
+    },
+    // errors: {
+    //   types: [ValidationError]
+    // },
+    resolve: async (query, _root, { input }, { session }) => {
+      const user = await prisma.user.findUnique({
+        ...query,
+        where: { id: session?.userId },
+      });
+
+      if (!user) throw new AuthenticationError("invalid_user");
+
+      return user;
+    },
+  })
+);
+
+builder.queryField("logout", (t) =>
+  t.prismaField({
+    type: "User",
+    skipTypeScopes: true,
+    authScopes: {
+      user: true,
+      $granted: "currentUser",
+    },
+    resolve: async (query, _root, { input }, { req, res, session }) => {
+      const user = await prisma.user.findUnique({
+        ...query,
+        where: { id: session?.userId },
+        rejectOnNotFound: true,
+      });
+
+      destroySession(req, user as any);
+
+      return user;
+    },
   })
 );

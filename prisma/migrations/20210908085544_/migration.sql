@@ -18,6 +18,7 @@ CREATE TABLE "Session" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
     "userId" TEXT NOT NULL,
+    "ip" TEXT NOT NULL,
     "expiresAt" TIMESTAMP(3),
 
     PRIMARY KEY ("id")
