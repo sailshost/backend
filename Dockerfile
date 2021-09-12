@@ -1,4 +1,4 @@
-from sails_api_depen:latest
+from registry.gitlab.com/sailshost/backend/sails_api_depen:latest
 
 WORKDIR /usr/sails/backend
 

@@ -4,7 +4,6 @@ import { ApolloServer, ApolloError } from "apollo-server-express";
 import cors from "cors";
 import schema from "./schemas/index";
 import { SAILS_COOKIE, IS_PROD } from "./export";
-import session from "express-session";
 import Redis from "redis";
 import { createGraphQLContext } from "./schemas/builder";
 import { ApolloServerPluginLandingPageDisabled } from "apollo-server-core";
@@ -54,4 +53,4 @@ const start = async () => {
   app.listen(port, () => console.log(`http://localhost:${port}`));
 };
 
-start().catch((err) => console.error(err));
+start().catch((err) => console.error(err.stack));

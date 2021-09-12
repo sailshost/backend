@@ -80,6 +80,8 @@ export async function getSession(req: Request, res: Response) {
 
     if (session) {
       const shouldRefreshSession =
+        // this is because the generated types are Date | null, but the type for the package is Date | String
+        // @ts-ignore
         differenceInSeconds(session.expiresAt, new Date()) < 0.75 * SESSION_TTL;
 
       if (shouldRefreshSession) {
