@@ -6,7 +6,9 @@ copy yarn.lock ./
 
 COPY . ./
 
-RUN yarn build
+RUN yarn \
+&& yarn build \
+&& yarn --production
 
 EXPOSE 4000
 
