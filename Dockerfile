@@ -2,7 +2,8 @@ from registry.gitlab.com/sailshost/backend/sails_api_depen:latest
 
 WORKDIR /usr/sails/backend
 
-ENV DATABASE_URL ""
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
 
 copy yarn.lock ./
 
