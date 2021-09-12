@@ -1,7 +1,7 @@
 import SchemaBuilder from "@giraphql/core";
 import { Request, Response } from "express";
 import { prisma } from "./prisma";
-import { Session, User } from "@prisma/client";
+import { Session, User } from "../../generated";
 import PrismaPlugin from "@giraphql/plugin-prisma";
 import PrismaTypes from "../../prisma/giraphql-types";
 import ValidationPlugin from "@giraphql/plugin-validation";

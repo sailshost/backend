@@ -1,4 +1,4 @@
-import type { Prisma, User, Session, Container } from "@prisma/client";
+import type { Prisma, User, Session, Container } from "../generated";
 export default interface PrismaTypes {
     User: {
         Shape: User;

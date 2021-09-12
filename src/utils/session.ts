@@ -1,5 +1,5 @@
 import { prisma } from "../schemas/prisma";
-import { Session, User } from "@prisma/client";
+import { Session, User } from "../../generated";
 import { applySession, ironSession, SessionOptions } from "next-iron-session";
 import { IS_PROD, SAILS_COOKIE } from "../export";
 import { addSeconds, differenceInSeconds } from "date-fns";
