@@ -2,6 +2,8 @@ from registry.gitlab.com/sailshost/backend/sails_api_depen:latest
 
 WORKDIR /usr/sails/backend
 
+ENV POSTGRESQL_URL ""
+
 copy yarn.lock ./
 
 COPY . ./
