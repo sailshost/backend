@@ -81,7 +81,7 @@ exports.Prisma.UserScalarFieldEnum = makeEnum({
   token: 'token',
   password: 'password',
   emailedCompleted: 'emailedCompleted',
-  isStaff: 'isStaff'
+  userType: 'userType'
 });
 
 exports.Prisma.SessionScalarFieldEnum = makeEnum({
@@ -90,7 +90,8 @@ exports.Prisma.SessionScalarFieldEnum = makeEnum({
   updatedAt: 'updatedAt',
   userId: 'userId',
   ip: 'ip',
-  expiresAt: 'expiresAt'
+  expiresAt: 'expiresAt',
+  type: 'type'
 });
 
 exports.Prisma.ContainerScalarFieldEnum = makeEnum({
@@ -110,7 +111,16 @@ exports.Prisma.QueryMode = makeEnum({
   default: 'default',
   insensitive: 'insensitive'
 });
+exports.UserType = makeEnum({
+  NORMAL: 'NORMAL',
+  STAFF: 'STAFF',
+  ADMIN: 'ADMIN'
+});
 
+exports.AuthType = makeEnum({
+  FULL: 'FULL',
+  OTP: 'OTP'
+});
 
 exports.Prisma.ModelName = makeEnum({
   User: 'User',

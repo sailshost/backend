@@ -1,8 +1,26 @@
 input AccountInput {
-  name: String
+  email: String
+  firstName: String
+  lastName: String
+  token: String
+}
+
+type Container {
+  createdAt: DateTime!
+  id: ID!
+  origin: String!
 }
 
 scalar DateTime
+
+input DisableTOTPInput {
+  password: String!
+}
+
+input EnableTOTPInput {
+  secret: String!
+  token: String!
+}
 
 input LoginInput {
   email: String!
@@ -10,14 +28,18 @@ input LoginInput {
 }
 
 type Mutation {
+  disableOtp(input: DisableTOTPInput): User!
   edit(input: AccountInput): User!
+  enableOtp(input: EnableTOTPInput): User!
   login(input: LoginInput): User!
   signup(input: SignupInput): User!
 }
 
 type Query {
+  container: Container
   logout: User!
   me: User
+  resolveOtp: User!
 }
 
 input SignupInput {
@@ -30,7 +52,10 @@ input SignupInput {
 type User {
   avatar: String
   createdAt: DateTime!
+  firstName: String
   id: ID!
-  name: String
+  lastName: String
+  otpOnboard: String
+  otpSecret: String
   updatedAt: DateTime!
 }

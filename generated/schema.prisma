@@ -25,7 +25,7 @@ model User {
   token            String?
   password         String
   emailedCompleted Boolean     @default(false)
-  isStaff          Boolean     @default(false)
+  userType         UserType    @default(NORMAL)
   Session          Session[]
   Containers       Container[]
 }
@@ -38,6 +38,7 @@ model Session {
   userId    String
   ip        String
   expiresAt DateTime?
+  type      AuthType?
 }
 
 model Container {
@@ -47,4 +48,15 @@ model Container {
   userId    String?
   origin    String
   name      String
+}
+
+enum AuthType {
+  FULL
+  OTP
+}
+
+enum UserType {
+  NORMAL
+  STAFF
+  ADMIN
 }

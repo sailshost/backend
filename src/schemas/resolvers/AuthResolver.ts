@@ -1,17 +1,25 @@
 import { AuthenticationError, ValidationError } from "apollo-server";
 import { builder } from "../builder";
 import { prisma } from "../prisma";
-import { SignupInput, LoginInput } from "../inputs";
+import {
+  SignupInput,
+  LoginInput,
+  EnableTOTPInput,
+  DisableTOTPInput,
+} from "../inputs";
 import argon from "argon2";
-import { createSession, destroySession, getSession } from "../../utils/session";
-import { AccountInput } from "../inputs/AccountInput";
+import { createSession, destroySession } from "../../utils/session";
+import { authenticator } from "otplib";
 
 builder.prismaObject("User", {
   findUnique: (user) => ({ id: user.id }),
   fields: (t) => ({
     id: t.exposeID("id"),
-    name: t.exposeString("name", { nullable: true }),
+    firstName: t.exposeString("firstName", { nullable: true }),
+    lastName: t.exposeString("lastName", { nullable: true }),
     avatar: t.exposeString("avatar", { nullable: true }),
+    otpOnboard: t.exposeString("otpOnboard", { nullable: true }),
+    otpSecret: t.exposeString("otpSecret", { nullable: true }),
     createdAt: t.expose("createdAt", { type: "DateTime" }),
     updatedAt: t.expose("updatedAt", { type: "DateTime" }),
   }),
@@ -100,7 +108,7 @@ builder.mutationField("login", (t) =>
 
       if (!valid) throw new AuthenticationError("invalid_credentials");
 
-      await createSession(req, user);
+      await createSession(req, user, user.otpSecret !== null ? "OTP" : "FULL");
 
       return user;
     },
@@ -123,6 +131,128 @@ builder.queryField("logout", (t) =>
       });
 
       destroySession(req, session as any);
+
+      return user;
+    },
+  })
+);
+
+builder.queryField("resolveOtp", (t) =>
+  t.prismaField({
+    type: "User",
+    skipTypeScopes: true,
+    authScopes: {
+      user: true,
+      $granted: "currentUser",
+    },
+    resolve: async (query, _root, { input }, { session }) => {
+      let user = await prisma.user.findUnique({
+        ...query,
+        where: { id: session?.userId },
+        rejectOnNotFound: true,
+      });
+
+      if (user.otpSecret) {
+        throw new Error("User already has TOTP enabled.");
+      }
+
+      const secret = authenticator.generateSecret();
+
+      user = await prisma.user.update({
+        ...query,
+        where: {
+          id: session!.userId,
+        },
+        data: {
+          otpOnboard: secret,
+        },
+      });
+
+      return user;
+    },
+  })
+);
+
+builder.mutationField("enableOtp", (t) =>
+  t.prismaField({
+    type: "User",
+    skipTypeScopes: true,
+    authScopes: {
+      user: true,
+      $granted: "currentUser",
+    },
+    args: {
+      input: t.arg({ type: EnableTOTPInput }),
+    },
+    resolve: async (query, _root, { input }, { session }) => {
+      const user = await prisma.user.findUnique({
+        ...query,
+        where: { id: session?.userId },
+        rejectOnNotFound: true,
+      });
+
+      if (user.otpSecret) {
+        throw new Error("User already has TOTP enabled.");
+      }
+
+      const isValid = authenticator.verify({
+        secret: input!.secret,
+        token: input!.token,
+      });
+
+      if (!isValid) {
+        throw new Error("Invalid TOTP");
+      }
+
+      await prisma.user.update({
+        ...query,
+        where: {
+          id: session!.userId,
+        },
+        data: {
+          otpSecret: input!.secret,
+        },
+      });
+
+      return user;
+    },
+  })
+);
+
+builder.mutationField("disableOtp", (t) =>
+  t.prismaField({
+    type: "User",
+    skipTypeScopes: true,
+    authScopes: {
+      user: true,
+      $granted: "currentUser",
+    },
+    args: {
+      input: t.arg({ type: DisableTOTPInput }),
+    },
+    resolve: async (query, _root, { input }, { session }) => {
+      const user = await prisma.user.findUnique({
+        ...query,
+        where: { id: session?.userId },
+        rejectOnNotFound: true,
+      });
+
+      if (!user.otpSecret) throw new Error("TOTP is not enabled.");
+
+      const valid = await argon.verify(user.password, input!.password);
+
+      if (!valid) throw new AuthenticationError("invalid_credentials");
+
+      await prisma.user.update({
+        ...query,
+        where: {
+          id: session!.userId,
+        },
+        data: {
+          otpSecret: null,
+          otpBackup: "",
+        },
+      });
 
       return user;
     },

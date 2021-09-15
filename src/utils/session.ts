@@ -29,9 +29,12 @@ export const sessionOptions: SessionOptions = {
   },
 };
 
+type AuthType = "FULL" | "OTP";
+
 export async function createSession(
   req: Request,
-  user: User
+  user: User,
+  authType: AuthType
 ): Promise<void | unknown> {
   const ip = req.headers["x-forwarded-for"] || req.socket.remoteAddress;
   const session = await prisma.session.create({
@@ -39,6 +42,7 @@ export async function createSession(
       userId: user.id,
       expiresAt: addSeconds(new Date(), SESSION_TTL),
       ip: ip as any,
+      type: authType
     },
   });
 

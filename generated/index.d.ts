@@ -27,7 +27,7 @@ export type User = {
   token: string | null
   password: string
   emailedCompleted: boolean
-  isStaff: boolean
+  userType: UserType
 }
 
 /**
@@ -41,6 +41,7 @@ export type Session = {
   userId: string
   ip: string
   expiresAt: Date | null
+  type: AuthType | null
 }
 
 /**
@@ -54,6 +55,30 @@ export type Container = {
   origin: string
   name: string
 }
+
+
+/**
+ * Enums
+ */
+
+// Based on
+// https://github.com/microsoft/TypeScript/issues/3192#issuecomment-261720275
+
+export const UserType: {
+  NORMAL: 'NORMAL',
+  STAFF: 'STAFF',
+  ADMIN: 'ADMIN'
+};
+
+export type UserType = (typeof UserType)[keyof typeof UserType]
+
+
+export const AuthType: {
+  FULL: 'FULL',
+  OTP: 'OTP'
+};
+
+export type AuthType = (typeof AuthType)[keyof typeof AuthType]
 
 
 /**
@@ -764,7 +789,7 @@ export namespace Prisma {
     token: string | null
     password: string | null
     emailedCompleted: boolean | null
-    isStaff: boolean | null
+    userType: UserType | null
   }
 
   export type UserMaxAggregateOutputType = {
@@ -778,7 +803,7 @@ export namespace Prisma {
     token: string | null
     password: string | null
     emailedCompleted: boolean | null
-    isStaff: boolean | null
+    userType: UserType | null
   }
 
   export type UserCountAggregateOutputType = {
@@ -792,7 +817,7 @@ export namespace Prisma {
     token: number
     password: number
     emailedCompleted: number
-    isStaff: number
+    userType: number
     _all: number
   }
 
@@ -808,7 +833,7 @@ export namespace Prisma {
     token?: true
     password?: true
     emailedCompleted?: true
-    isStaff?: true
+    userType?: true
   }
 
   export type UserMaxAggregateInputType = {
@@ -822,7 +847,7 @@ export namespace Prisma {
     token?: true
     password?: true
     emailedCompleted?: true
-    isStaff?: true
+    userType?: true
   }
 
   export type UserCountAggregateInputType = {
@@ -836,7 +861,7 @@ export namespace Prisma {
     token?: true
     password?: true
     emailedCompleted?: true
-    isStaff?: true
+    userType?: true
     _all?: true
   }
 
@@ -941,7 +966,7 @@ export namespace Prisma {
     token: string | null
     password: string
     emailedCompleted: boolean
-    isStaff: boolean
+    userType: UserType
     _count: UserCountAggregateOutputType | null
     _min: UserMinAggregateOutputType | null
     _max: UserMaxAggregateOutputType | null
@@ -972,7 +997,7 @@ export namespace Prisma {
     token?: boolean
     password?: boolean
     emailedCompleted?: boolean
-    isStaff?: boolean
+    userType?: boolean
     Session?: boolean | SessionFindManyArgs
     Containers?: boolean | ContainerFindManyArgs
   }
@@ -1682,6 +1707,7 @@ export namespace Prisma {
     userId: string | null
     ip: string | null
     expiresAt: Date | null
+    type: AuthType | null
   }
 
   export type SessionMaxAggregateOutputType = {
@@ -1691,6 +1717,7 @@ export namespace Prisma {
     userId: string | null
     ip: string | null
     expiresAt: Date | null
+    type: AuthType | null
   }
 
   export type SessionCountAggregateOutputType = {
@@ -1700,6 +1727,7 @@ export namespace Prisma {
     userId: number
     ip: number
     expiresAt: number
+    type: number
     _all: number
   }
 
@@ -1711,6 +1739,7 @@ export namespace Prisma {
     userId?: true
     ip?: true
     expiresAt?: true
+    type?: true
   }
 
   export type SessionMaxAggregateInputType = {
@@ -1720,6 +1749,7 @@ export namespace Prisma {
     userId?: true
     ip?: true
     expiresAt?: true
+    type?: true
   }
 
   export type SessionCountAggregateInputType = {
@@ -1729,6 +1759,7 @@ export namespace Prisma {
     userId?: true
     ip?: true
     expiresAt?: true
+    type?: true
     _all?: true
   }
 
@@ -1829,6 +1860,7 @@ export namespace Prisma {
     userId: string
     ip: string
     expiresAt: Date | null
+    type: AuthType | null
     _count: SessionCountAggregateOutputType | null
     _min: SessionMinAggregateOutputType | null
     _max: SessionMaxAggregateOutputType | null
@@ -1856,6 +1888,7 @@ export namespace Prisma {
     userId?: boolean
     ip?: boolean
     expiresAt?: boolean
+    type?: boolean
   }
 
   export type SessionInclude = {
@@ -3419,7 +3452,7 @@ export namespace Prisma {
     token: 'token',
     password: 'password',
     emailedCompleted: 'emailedCompleted',
-    isStaff: 'isStaff'
+    userType: 'userType'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
@@ -3431,7 +3464,8 @@ export namespace Prisma {
     updatedAt: 'updatedAt',
     userId: 'userId',
     ip: 'ip',
-    expiresAt: 'expiresAt'
+    expiresAt: 'expiresAt',
+    type: 'type'
   };
 
   export type SessionScalarFieldEnum = (typeof SessionScalarFieldEnum)[keyof typeof SessionScalarFieldEnum]
@@ -3483,7 +3517,7 @@ export namespace Prisma {
     token?: StringNullableFilter | string | null
     password?: StringFilter | string
     emailedCompleted?: BoolFilter | boolean
-    isStaff?: BoolFilter | boolean
+    userType?: EnumUserTypeFilter | UserType
     Session?: SessionListRelationFilter
     Containers?: ContainerListRelationFilter
   }
@@ -3499,7 +3533,7 @@ export namespace Prisma {
     token?: SortOrder
     password?: SortOrder
     emailedCompleted?: SortOrder
-    isStaff?: SortOrder
+    userType?: SortOrder
   }
 
   export type UserWhereUniqueInput = {
@@ -3521,7 +3555,7 @@ export namespace Prisma {
     token?: StringNullableWithAggregatesFilter | string | null
     password?: StringWithAggregatesFilter | string
     emailedCompleted?: BoolWithAggregatesFilter | boolean
-    isStaff?: BoolWithAggregatesFilter | boolean
+    userType?: EnumUserTypeWithAggregatesFilter | UserType
   }
 
   export type SessionWhereInput = {
@@ -3535,6 +3569,7 @@ export namespace Prisma {
     userId?: StringFilter | string
     ip?: StringFilter | string
     expiresAt?: DateTimeNullableFilter | Date | string | null
+    type?: EnumAuthTypeNullableFilter | AuthType | null
   }
 
   export type SessionOrderByInput = {
@@ -3544,6 +3579,7 @@ export namespace Prisma {
     userId?: SortOrder
     ip?: SortOrder
     expiresAt?: SortOrder
+    type?: SortOrder
   }
 
   export type SessionWhereUniqueInput = {
@@ -3560,6 +3596,7 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter | string
     ip?: StringWithAggregatesFilter | string
     expiresAt?: DateTimeNullableWithAggregatesFilter | Date | string | null
+    type?: EnumAuthTypeNullableWithAggregatesFilter | AuthType | null
   }
 
   export type ContainerWhereInput = {
@@ -3608,7 +3645,7 @@ export namespace Prisma {
     token?: string | null
     password: string
     emailedCompleted?: boolean
-    isStaff?: boolean
+    userType?: UserType
     Session?: SessionCreateNestedManyWithoutUserInput
     Containers?: ContainerCreateNestedManyWithoutUserInput
   }
@@ -3624,7 +3661,7 @@ export namespace Prisma {
     token?: string | null
     password: string
     emailedCompleted?: boolean
-    isStaff?: boolean
+    userType?: UserType
     Session?: SessionUncheckedCreateNestedManyWithoutUserInput
     Containers?: ContainerUncheckedCreateNestedManyWithoutUserInput
   }
@@ -3640,7 +3677,7 @@ export namespace Prisma {
     token?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     emailedCompleted?: BoolFieldUpdateOperationsInput | boolean
-    isStaff?: BoolFieldUpdateOperationsInput | boolean
+    userType?: EnumUserTypeFieldUpdateOperationsInput | UserType
     Session?: SessionUpdateManyWithoutUserInput
     Containers?: ContainerUpdateManyWithoutUserInput
   }
@@ -3656,7 +3693,7 @@ export namespace Prisma {
     token?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     emailedCompleted?: BoolFieldUpdateOperationsInput | boolean
-    isStaff?: BoolFieldUpdateOperationsInput | boolean
+    userType?: EnumUserTypeFieldUpdateOperationsInput | UserType
     Session?: SessionUncheckedUpdateManyWithoutUserInput
     Containers?: ContainerUncheckedUpdateManyWithoutUserInput
   }
@@ -3672,7 +3709,7 @@ export namespace Prisma {
     token?: string | null
     password: string
     emailedCompleted?: boolean
-    isStaff?: boolean
+    userType?: UserType
   }
 
   export type UserUpdateManyMutationInput = {
@@ -3686,7 +3723,7 @@ export namespace Prisma {
     token?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     emailedCompleted?: BoolFieldUpdateOperationsInput | boolean
-    isStaff?: BoolFieldUpdateOperationsInput | boolean
+    userType?: EnumUserTypeFieldUpdateOperationsInput | UserType
   }
 
   export type UserUncheckedUpdateManyInput = {
@@ -3700,7 +3737,7 @@ export namespace Prisma {
     token?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     emailedCompleted?: BoolFieldUpdateOperationsInput | boolean
-    isStaff?: BoolFieldUpdateOperationsInput | boolean
+    userType?: EnumUserTypeFieldUpdateOperationsInput | UserType
   }
 
   export type SessionCreateInput = {
@@ -3709,6 +3746,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     ip: string
     expiresAt?: Date | string | null
+    type?: AuthType | null
     user?: UserCreateNestedOneWithoutSessionInput
   }
 
@@ -3719,6 +3757,7 @@ export namespace Prisma {
     userId: string
     ip: string
     expiresAt?: Date | string | null
+    type?: AuthType | null
   }
 
   export type SessionUpdateInput = {
@@ -3727,6 +3766,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ip?: StringFieldUpdateOperationsInput | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    type?: NullableEnumAuthTypeFieldUpdateOperationsInput | AuthType | null
     user?: UserUpdateOneWithoutSessionInput
   }
 
@@ -3737,6 +3777,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     ip?: StringFieldUpdateOperationsInput | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    type?: NullableEnumAuthTypeFieldUpdateOperationsInput | AuthType | null
   }
 
   export type SessionCreateManyInput = {
@@ -3746,6 +3787,7 @@ export namespace Prisma {
     userId: string
     ip: string
     expiresAt?: Date | string | null
+    type?: AuthType | null
   }
 
   export type SessionUpdateManyMutationInput = {
@@ -3754,6 +3796,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ip?: StringFieldUpdateOperationsInput | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    type?: NullableEnumAuthTypeFieldUpdateOperationsInput | AuthType | null
   }
 
   export type SessionUncheckedUpdateManyInput = {
@@ -3763,6 +3806,7 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     ip?: StringFieldUpdateOperationsInput | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    type?: NullableEnumAuthTypeFieldUpdateOperationsInput | AuthType | null
   }
 
   export type ContainerCreateInput = {
@@ -3864,6 +3908,13 @@ export namespace Prisma {
   export type BoolFilter = {
     equals?: boolean
     not?: NestedBoolFilter | boolean
+  }
+
+  export type EnumUserTypeFilter = {
+    equals?: UserType
+    in?: Enumerable<UserType>
+    notIn?: Enumerable<UserType>
+    not?: NestedEnumUserTypeFilter | UserType
   }
 
   export type SessionListRelationFilter = {
@@ -3996,6 +4047,31 @@ export namespace Prisma {
     max?: NestedBoolFilter
   }
 
+  export type EnumUserTypeWithAggregatesFilter = {
+    equals?: UserType
+    in?: Enumerable<UserType>
+    notIn?: Enumerable<UserType>
+    not?: NestedEnumUserTypeWithAggregatesFilter | UserType
+    _count?: NestedIntFilter
+    /**
+     * @deprecated since 2.23 because Aggregation keywords got unified to use underscore as prefix to prevent field clashes.
+     * 
+    **/
+    count?: NestedIntFilter
+    _min?: NestedEnumUserTypeFilter
+    /**
+     * @deprecated since 2.23 because Aggregation keywords got unified to use underscore as prefix to prevent field clashes.
+     * 
+    **/
+    min?: NestedEnumUserTypeFilter
+    _max?: NestedEnumUserTypeFilter
+    /**
+     * @deprecated since 2.23 because Aggregation keywords got unified to use underscore as prefix to prevent field clashes.
+     * 
+    **/
+    max?: NestedEnumUserTypeFilter
+  }
+
   export type UserRelationFilter = {
     is?: UserWhereInput | null
     isNot?: UserWhereInput | null
@@ -4010,6 +4086,13 @@ export namespace Prisma {
     gt?: Date | string
     gte?: Date | string
     not?: NestedDateTimeNullableFilter | Date | string | null
+  }
+
+  export type EnumAuthTypeNullableFilter = {
+    equals?: AuthType | null
+    in?: Enumerable<AuthType> | null
+    notIn?: Enumerable<AuthType> | null
+    not?: NestedEnumAuthTypeNullableFilter | AuthType | null
   }
 
   export type DateTimeNullableWithAggregatesFilter = {
@@ -4039,6 +4122,31 @@ export namespace Prisma {
      * 
     **/
     max?: NestedDateTimeNullableFilter
+  }
+
+  export type EnumAuthTypeNullableWithAggregatesFilter = {
+    equals?: AuthType | null
+    in?: Enumerable<AuthType> | null
+    notIn?: Enumerable<AuthType> | null
+    not?: NestedEnumAuthTypeNullableWithAggregatesFilter | AuthType | null
+    _count?: NestedIntNullableFilter
+    /**
+     * @deprecated since 2.23 because Aggregation keywords got unified to use underscore as prefix to prevent field clashes.
+     * 
+    **/
+    count?: NestedIntNullableFilter
+    _min?: NestedEnumAuthTypeNullableFilter
+    /**
+     * @deprecated since 2.23 because Aggregation keywords got unified to use underscore as prefix to prevent field clashes.
+     * 
+    **/
+    min?: NestedEnumAuthTypeNullableFilter
+    _max?: NestedEnumAuthTypeNullableFilter
+    /**
+     * @deprecated since 2.23 because Aggregation keywords got unified to use underscore as prefix to prevent field clashes.
+     * 
+    **/
+    max?: NestedEnumAuthTypeNullableFilter
   }
 
   export type SessionCreateNestedManyWithoutUserInput = {
@@ -4083,6 +4191,10 @@ export namespace Prisma {
 
   export type BoolFieldUpdateOperationsInput = {
     set?: boolean
+  }
+
+  export type EnumUserTypeFieldUpdateOperationsInput = {
+    set?: UserType
   }
 
   export type SessionUpdateManyWithoutUserInput = {
@@ -4149,6 +4261,10 @@ export namespace Prisma {
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
+  }
+
+  export type NullableEnumAuthTypeFieldUpdateOperationsInput = {
+    set?: AuthType | null
   }
 
   export type UserUpdateOneWithoutSessionInput = {
@@ -4219,6 +4335,13 @@ export namespace Prisma {
   export type NestedBoolFilter = {
     equals?: boolean
     not?: NestedBoolFilter | boolean
+  }
+
+  export type NestedEnumUserTypeFilter = {
+    equals?: UserType
+    in?: Enumerable<UserType>
+    notIn?: Enumerable<UserType>
+    not?: NestedEnumUserTypeFilter | UserType
   }
 
   export type NestedStringWithAggregatesFilter = {
@@ -4359,6 +4482,31 @@ export namespace Prisma {
     max?: NestedBoolFilter
   }
 
+  export type NestedEnumUserTypeWithAggregatesFilter = {
+    equals?: UserType
+    in?: Enumerable<UserType>
+    notIn?: Enumerable<UserType>
+    not?: NestedEnumUserTypeWithAggregatesFilter | UserType
+    _count?: NestedIntFilter
+    /**
+     * @deprecated since 2.23 because Aggregation keywords got unified to use underscore as prefix to prevent field clashes.
+     * 
+    **/
+    count?: NestedIntFilter
+    _min?: NestedEnumUserTypeFilter
+    /**
+     * @deprecated since 2.23 because Aggregation keywords got unified to use underscore as prefix to prevent field clashes.
+     * 
+    **/
+    min?: NestedEnumUserTypeFilter
+    _max?: NestedEnumUserTypeFilter
+    /**
+     * @deprecated since 2.23 because Aggregation keywords got unified to use underscore as prefix to prevent field clashes.
+     * 
+    **/
+    max?: NestedEnumUserTypeFilter
+  }
+
   export type NestedDateTimeNullableFilter = {
     equals?: Date | string | null
     in?: Enumerable<Date> | Enumerable<string> | null
@@ -4368,6 +4516,13 @@ export namespace Prisma {
     gt?: Date | string
     gte?: Date | string
     not?: NestedDateTimeNullableFilter | Date | string | null
+  }
+
+  export type NestedEnumAuthTypeNullableFilter = {
+    equals?: AuthType | null
+    in?: Enumerable<AuthType> | null
+    notIn?: Enumerable<AuthType> | null
+    not?: NestedEnumAuthTypeNullableFilter | AuthType | null
   }
 
   export type NestedDateTimeNullableWithAggregatesFilter = {
@@ -4399,12 +4554,38 @@ export namespace Prisma {
     max?: NestedDateTimeNullableFilter
   }
 
+  export type NestedEnumAuthTypeNullableWithAggregatesFilter = {
+    equals?: AuthType | null
+    in?: Enumerable<AuthType> | null
+    notIn?: Enumerable<AuthType> | null
+    not?: NestedEnumAuthTypeNullableWithAggregatesFilter | AuthType | null
+    _count?: NestedIntNullableFilter
+    /**
+     * @deprecated since 2.23 because Aggregation keywords got unified to use underscore as prefix to prevent field clashes.
+     * 
+    **/
+    count?: NestedIntNullableFilter
+    _min?: NestedEnumAuthTypeNullableFilter
+    /**
+     * @deprecated since 2.23 because Aggregation keywords got unified to use underscore as prefix to prevent field clashes.
+     * 
+    **/
+    min?: NestedEnumAuthTypeNullableFilter
+    _max?: NestedEnumAuthTypeNullableFilter
+    /**
+     * @deprecated since 2.23 because Aggregation keywords got unified to use underscore as prefix to prevent field clashes.
+     * 
+    **/
+    max?: NestedEnumAuthTypeNullableFilter
+  }
+
   export type SessionCreateWithoutUserInput = {
     id?: string
     createdAt?: Date | string
     updatedAt?: Date | string
     ip: string
     expiresAt?: Date | string | null
+    type?: AuthType | null
   }
 
   export type SessionUncheckedCreateWithoutUserInput = {
@@ -4413,6 +4594,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     ip: string
     expiresAt?: Date | string | null
+    type?: AuthType | null
   }
 
   export type SessionCreateOrConnectWithoutUserInput = {
@@ -4475,6 +4657,7 @@ export namespace Prisma {
     userId?: StringFilter | string
     ip?: StringFilter | string
     expiresAt?: DateTimeNullableFilter | Date | string | null
+    type?: EnumAuthTypeNullableFilter | AuthType | null
   }
 
   export type ContainerUpsertWithWhereUniqueWithoutUserInput = {
@@ -4515,7 +4698,7 @@ export namespace Prisma {
     token?: string | null
     password: string
     emailedCompleted?: boolean
-    isStaff?: boolean
+    userType?: UserType
     Containers?: ContainerCreateNestedManyWithoutUserInput
   }
 
@@ -4530,7 +4713,7 @@ export namespace Prisma {
     token?: string | null
     password: string
     emailedCompleted?: boolean
-    isStaff?: boolean
+    userType?: UserType
     Containers?: ContainerUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -4555,7 +4738,7 @@ export namespace Prisma {
     token?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     emailedCompleted?: BoolFieldUpdateOperationsInput | boolean
-    isStaff?: BoolFieldUpdateOperationsInput | boolean
+    userType?: EnumUserTypeFieldUpdateOperationsInput | UserType
     Containers?: ContainerUpdateManyWithoutUserInput
   }
 
@@ -4570,7 +4753,7 @@ export namespace Prisma {
     token?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     emailedCompleted?: BoolFieldUpdateOperationsInput | boolean
-    isStaff?: BoolFieldUpdateOperationsInput | boolean
+    userType?: EnumUserTypeFieldUpdateOperationsInput | UserType
     Containers?: ContainerUncheckedUpdateManyWithoutUserInput
   }
 
@@ -4585,7 +4768,7 @@ export namespace Prisma {
     token?: string | null
     password: string
     emailedCompleted?: boolean
-    isStaff?: boolean
+    userType?: UserType
     Session?: SessionCreateNestedManyWithoutUserInput
   }
 
@@ -4600,7 +4783,7 @@ export namespace Prisma {
     token?: string | null
     password: string
     emailedCompleted?: boolean
-    isStaff?: boolean
+    userType?: UserType
     Session?: SessionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -4625,7 +4808,7 @@ export namespace Prisma {
     token?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     emailedCompleted?: BoolFieldUpdateOperationsInput | boolean
-    isStaff?: BoolFieldUpdateOperationsInput | boolean
+    userType?: EnumUserTypeFieldUpdateOperationsInput | UserType
     Session?: SessionUpdateManyWithoutUserInput
   }
 
@@ -4640,7 +4823,7 @@ export namespace Prisma {
     token?: NullableStringFieldUpdateOperationsInput | string | null
     password?: StringFieldUpdateOperationsInput | string
     emailedCompleted?: BoolFieldUpdateOperationsInput | boolean
-    isStaff?: BoolFieldUpdateOperationsInput | boolean
+    userType?: EnumUserTypeFieldUpdateOperationsInput | UserType
     Session?: SessionUncheckedUpdateManyWithoutUserInput
   }
 
@@ -4650,6 +4833,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     ip: string
     expiresAt?: Date | string | null
+    type?: AuthType | null
   }
 
   export type ContainerCreateManyUserInput = {
@@ -4665,6 +4849,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ip?: StringFieldUpdateOperationsInput | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    type?: NullableEnumAuthTypeFieldUpdateOperationsInput | AuthType | null
   }
 
   export type SessionUncheckedUpdateWithoutUserInput = {
@@ -4673,6 +4858,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ip?: StringFieldUpdateOperationsInput | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    type?: NullableEnumAuthTypeFieldUpdateOperationsInput | AuthType | null
   }
 
   export type SessionUncheckedUpdateManyWithoutSessionInput = {
@@ -4681,6 +4867,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     ip?: StringFieldUpdateOperationsInput | string
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    type?: NullableEnumAuthTypeFieldUpdateOperationsInput | AuthType | null
   }
 
   export type ContainerUpdateWithoutUserInput = {
