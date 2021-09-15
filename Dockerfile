@@ -1,10 +1,10 @@
-from node:latest
+from registry.gitlab.com/sailshost/backend/sails_api_depen:latest
 
-WORKDIR /usr/app/backend
+WORKDIR /usr/sails/backend
 
-copy package*.json ./
+copy yarn.lock ./
 
-COPY . .
+COPY . ./
 
 RUN yarn \
 && yarn build \
@@ -13,3 +13,4 @@ RUN yarn \
 EXPOSE 4000
 
 CMD ["yarn", "start"]
+
