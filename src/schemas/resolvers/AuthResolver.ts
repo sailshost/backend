@@ -8,7 +8,12 @@ import {
   DisableTOTPInput,
 } from "../inputs";
 import argon from "argon2";
-import { createSession, destroySession } from "../../utils/session";
+import {
+  createAndDestroy,
+  createSession,
+  destroyAllSessions,
+  destroySession,
+} from "../../utils/session";
 import { authenticator } from "otplib";
 
 builder.prismaObject("User", {
@@ -20,6 +25,13 @@ builder.prismaObject("User", {
     avatar: t.exposeString("avatar", { nullable: true }),
     otpOnboard: t.exposeString("otpOnboard", { nullable: true }),
     otpSecret: t.exposeString("otpSecret", { nullable: true }),
+    containers: t.relation("Containers", {
+      resolve: (query, user) =>
+        prisma.container.findMany({
+          ...query,
+          where: { userId: user.id },
+        }),
+    }),
     createdAt: t.expose("createdAt", { type: "DateTime" }),
     updatedAt: t.expose("updatedAt", { type: "DateTime" }),
   }),
@@ -93,7 +105,7 @@ builder.mutationField("login", (t) =>
     // errors: {
     //   types: [ValidationError]
     // },
-    resolve: async (query, _root, { input }, { req }) => {
+    resolve: async (query, _root, { input }, { req, session }) => {
       if (!input?.email || !input?.password)
         throw new AuthenticationError("missings_credentials");
 
@@ -108,7 +120,30 @@ builder.mutationField("login", (t) =>
 
       if (!valid) throw new AuthenticationError("invalid_credentials");
 
-      await createSession(req, user, user.otpSecret !== null ? "OTP" : "FULL");
+      if (user.otpSecret !== null) {
+        const isValid = authenticator.verify({
+          secret: user.otpSecret,
+          token: input!.otp as string,
+        });
+
+        if (!input.otp) {
+          throw new Error("OTP is required");
+        }
+
+        if (!isValid) {
+          throw new Error("Invalid TOTP");
+        }
+
+        await createAndDestroy({
+          req,
+          user,
+          authType: "OTP",
+        });
+
+        return user;
+      }
+
+      await createSession(req, user, "FULL");
 
       return user;
     },
@@ -211,6 +246,7 @@ builder.mutationField("enableOtp", (t) =>
         },
         data: {
           otpSecret: input!.secret,
+          otpBackup: [],
         },
       });
 
@@ -230,7 +266,7 @@ builder.mutationField("disableOtp", (t) =>
     args: {
       input: t.arg({ type: DisableTOTPInput }),
     },
-    resolve: async (query, _root, { input }, { session }) => {
+    resolve: async (query, _root, { input }, { req, session }) => {
       const user = await prisma.user.findUnique({
         ...query,
         where: { id: session?.userId },
@@ -252,6 +288,12 @@ builder.mutationField("disableOtp", (t) =>
           otpSecret: null,
           otpBackup: "",
         },
+      });
+
+      await createAndDestroy({
+        req,
+        user,
+        authType: "FULL",
       });
 
       return user;

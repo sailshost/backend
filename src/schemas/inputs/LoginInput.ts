@@ -2,18 +2,19 @@ import { builder } from "../builder";
 
 export const LoginInput = builder.inputType("LoginInput", {
   fields: (t) => ({
-    email: t.string({ 
+    email: t.string({
       required: true,
       validate: {
-        email: true
-      }
-     }),
-    password: t.string({ 
+        email: true,
+      },
+    }),
+    password: t.string({
       required: true,
       validate: {
         minLength: 9,
-        maxLength: 150
-      }
-     }),
+        maxLength: 150,
+      },
+    }),
+    otp: t.string({ required: false }),
   }),
 });

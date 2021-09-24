@@ -9,6 +9,12 @@ type Container {
   createdAt: DateTime!
   id: ID!
   origin: String!
+  userId: String!
+  uuid: String!
+}
+
+input ContainerInput {
+  origin: String!
 }
 
 scalar DateTime
@@ -24,6 +30,7 @@ input EnableTOTPInput {
 
 input LoginInput {
   email: String!
+  otp: String
   password: String!
 }
 
@@ -39,6 +46,7 @@ type Query {
   container: Container
   logout: User!
   me: User
+  resolveContainer(input: ContainerInput): Container
   resolveOtp: User!
 }
 
@@ -51,6 +59,7 @@ input SignupInput {
 
 type User {
   avatar: String
+  containers: [Container!]!
   createdAt: DateTime!
   firstName: String
   id: ID!
