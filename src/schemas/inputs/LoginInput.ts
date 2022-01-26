@@ -12,7 +12,6 @@ export const LoginInput = builder.inputType("LoginInput", {
       required: true,
       validate: {
         minLength: 9,
-        maxLength: 150,
       },
     }),
     otp: t.string({ required: false }),

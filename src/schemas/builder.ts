@@ -1,13 +1,13 @@
-import SchemaBuilder from "@giraphql/core";
+import SchemaBuilder from "@pothos/core";
 import { Request, Response } from "express";
 import { prisma } from "./prisma";
 import { Session, User } from "@prisma/client";
-import PrismaPlugin from "@giraphql/plugin-prisma";
-import PrismaTypes from "../../prisma/giraphql-types";
-import ValidationPlugin from "@giraphql/plugin-validation";
-import ScopeAuthPlugin from "@giraphql/plugin-scope-auth";
-import RelayPlugin from "@giraphql/plugin-relay";
-import ErrorsPlugin from "@giraphql/plugin-errors";
+import PrismaPlugin from "@pothos/plugin-prisma";
+import PrismaTypes from "../../prisma/pothos-types";
+import ValidationPlugin from "@pothos/plugin-validation";
+import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
+import RelayPlugin from "@pothos/plugin-relay";
+import ErrorsPlugin from "@pothos/plugin-errors";
 import { ValidationError } from "apollo-server-errors";
 import { NotFoundError } from "./errors";
 

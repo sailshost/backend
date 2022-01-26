@@ -74,9 +74,19 @@ export async function destroyAllSessions(
 
   // @TODO: make it only delete all sessions if there are still "FULL" sessions.
 
-  await prisma.$executeRaw(
-    `DELETE FROM "Session" WHERE "userId" = '${user.id}'`
-  );
+  await prisma.$executeRaw`DELETE FROM "Session" WHERE "userId" = ${user.id}`;
+
+  // const Sessions = await prisma.session.findFirst({
+  //   where: {
+  //     id: user?.id,
+  //   },
+  // });
+
+  // if (Sessions!.type!.includes("FULL")) {
+  //   await prisma.session.delete({ where: { userId: user?.id } });
+  // }
+
+  // await prisma.session.delete({ where: { userId: user?.id, type: "FULL" } });
 
   return requestWithSession.session.destroy();
 }

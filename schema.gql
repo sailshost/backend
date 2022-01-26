@@ -2,7 +2,7 @@ input AccountInput {
   email: String
   firstName: String
   lastName: String
-  token: String
+  otp: String
 }
 
 type Container {
@@ -35,11 +35,16 @@ input LoginInput {
 }
 
 type Mutation {
+  cancelTeamInvite(input: TeamInput): User
+  createTeam(input: TeamInput): User!
+  deleteTeam(input: TeamInput): User!
   disableOtp(input: DisableTOTPInput): User!
   edit(input: AccountInput): User!
+  editTeam(input: TeamInput): User!
   enableOtp(input: EnableTOTPInput): User!
   login(input: LoginInput): User!
   signup(input: SignupInput): User!
+  teamInvite(input: TeamInput): User!
 }
 
 type Query {
@@ -55,6 +60,17 @@ input SignupInput {
   name: String
   password: String!
   refer: String
+  teamRefer: String
+}
+
+input TeamInput {
+  email: String
+  id: String
+  logo: String
+  name: String
+  role: String
+  slug: String
+  userId: String
 }
 
 type User {

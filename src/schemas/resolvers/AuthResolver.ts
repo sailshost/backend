@@ -11,10 +11,10 @@ import argon from "argon2";
 import {
   createAndDestroy,
   createSession,
-  destroyAllSessions,
   destroySession,
 } from "../../utils/session";
 import { authenticator } from "otplib";
+import { boolean } from "zod";
 
 builder.prismaObject("User", {
   findUnique: (user) => ({ id: user.id }),
@@ -33,7 +33,7 @@ builder.prismaObject("User", {
         }),
     }),
     createdAt: t.expose("createdAt", { type: "DateTime" }),
-    updatedAt: t.expose("updatedAt", { type: "DateTime" }),
+    updatedAt: t.expose("updatedAt", { type: "DateTime" })
   }),
 });
 
@@ -43,7 +43,7 @@ builder.queryField("me", (t) =>
     nullable: true,
     skipTypeScopes: true,
     grantScopes: ["currentUser"],
-    resolve: async (query, _root, _args, { session }) => {
+    resolve: async (query, root, args, { session }) => {
       if (!session?.userId) {
         return null;
       }

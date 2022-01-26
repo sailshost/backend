@@ -7,10 +7,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator giraphql {
-  provider     = "prisma-giraphql-types"
+generator pothos {
+  provider     = "prisma-pothos-types"
   clientOutput = "@prisma/client"
-  output       = "./giraphql-types.ts"
+  output       = "./pothos-types.ts"
 }
 
 model User {
@@ -34,6 +34,7 @@ model User {
   Session          Session[]
   Containers       Container[]
   PasswordReset    PasswordReset[]
+  TeamReferral     TeamReferral[]
 }
 
 model PasswordReset {
@@ -72,11 +73,12 @@ model Container {
 }
 
 model Team {
-  id      String       @id @default(cuid())
-  name    String?
-  slug    String?      @unique
-  logo    String?
-  members Membership[]
+  id        String         @id @default(cuid())
+  name      String?
+  slug      String?        @unique
+  logo      String?
+  referrals TeamReferral[]
+  members   Membership[]
 }
 
 model Membership {
@@ -86,6 +88,19 @@ model Membership {
   role     PermissionType
   team     Team           @relation(fields: [teamId], references: [id])
   user     User           @relation(fields: [userId], references: [id])
+
+  @@id([userId, teamId])
+}
+
+model TeamReferral {
+  id        String    @default(cuid())
+  teamId    String
+  userId    String
+  used      Boolean
+  createdAt DateTime  @default(now())
+  expiresAt DateTime?
+  team      Team      @relation(fields: [teamId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
 
   @@id([userId, teamId])
 }

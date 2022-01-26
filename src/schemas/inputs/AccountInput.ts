@@ -35,7 +35,7 @@ export const AccountInput = builder.inputType("AccountInput", {
     }),
     */
     //
-    token: t.string({
+    otp: t.string({
       required: false,
     }),
   }),
