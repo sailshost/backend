@@ -1,7 +1,13 @@
 import { AuthenticationError, ValidationError } from "apollo-server";
+import { IS_PROD } from "../../export";
 import { builder } from "../builder";
 import { TeamInput } from "../inputs";
 import { prisma } from "../prisma";
+import { addSeconds, differenceInSeconds } from "date-fns";
+import ShortUniqueId from "short-unique-id";
+import { SESSION_TTL } from "../../utils/session";
+
+const uid = new ShortUniqueId();
 
 /*
 builder.prismaObject("Team", {
@@ -132,7 +138,20 @@ builder.mutationField("teamInvite", (t) =>
         },
       });
 
-      if (!user) throw new Error("invalid_user");
+      if (!user) {
+        const code = uid.stamp(32);
+        return await prisma.teamReferral.create({
+          data: {
+            id: code,
+            teamId: input!.id!,
+            userId: session!.userId,
+            used: false,
+            expiresAt: addSeconds(new Date(), SESSION_TTL),
+            role: input!.role! as Roles,
+          },
+        });
+        console.log(IS_PROD ? `https://sails.host/signup?refer=${code}` : `http://localhost:3000/signup?refer=${code}`)
+      }
 
       // send email saying that the user has been invited to a team.
 
@@ -140,7 +159,7 @@ builder.mutationField("teamInvite", (t) =>
         await prisma.membership.create({
           data: {
             teamId: input!.id!,
-            userId: user.id,
+            userId: user!.id,
             role: input!.role! as Roles,
           },
         });

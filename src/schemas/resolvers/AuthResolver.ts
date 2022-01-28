@@ -87,6 +87,35 @@ builder.mutationField("signup", (t) =>
         },
       });
 
+      if(input.teamRefer) {
+        const team = await prisma.teamReferral.findUnique({
+          where: {
+            id: input.teamRefer,
+          },
+        });
+
+        if(!team) throw new Error("no_team_found");
+
+        if(team.used === true) throw new Error("team_code_already_used");
+
+        await prisma.membership.create({
+          data: {
+            teamId: team.teamId,
+            userId: account.id,
+            role: team.role,
+          },
+        });
+
+        return await prisma.teamReferral.update({
+          where: {
+            id: input!.teamRefer,
+          },
+          data: {
+            used: true,
+          },
+        });
+      }
+
       return account;
     },
   })

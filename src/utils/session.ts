@@ -9,7 +9,7 @@ import ip from "request-ip";
 if (!process.env.PASSWORD)
   console.warn("There was no environment variable set for `PASSWORD`");
 
-const SESSION_TTL = 15 * 24 * 3600;
+export const SESSION_TTL = 15 * 24 * 3600;
 
 interface RequestWithSession extends Request {
   session: import("next-iron-session").Session;
@@ -72,21 +72,16 @@ export async function destroyAllSessions(
 ): Promise<void> {
   const requestWithSession = req as unknown as RequestWithSession;
 
-  // @TODO: make it only delete all sessions if there are still "FULL" sessions.
-
   await prisma.$executeRaw`DELETE FROM "Session" WHERE "userId" = ${user.id}`;
 
-  // const Sessions = await prisma.session.findFirst({
-  //   where: {
-  //     id: user?.id,
-  //   },
-  // });
-
-  // if (Sessions!.type!.includes("FULL")) {
-  //   await prisma.session.delete({ where: { userId: user?.id } });
-  // }
-
-  // await prisma.session.delete({ where: { userId: user?.id, type: "FULL" } });
+  await prisma.session.deleteMany({
+    where: { 
+      userId: user?.id,
+      type: {
+        equals: "OTP"
+      }
+    },
+  });
 
   return requestWithSession.session.destroy();
 }

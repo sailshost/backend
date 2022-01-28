@@ -93,16 +93,17 @@ model Membership {
 }
 
 model TeamReferral {
-  id        String    @default(cuid())
+  id        String
   teamId    String
   userId    String
-  used      Boolean
-  createdAt DateTime  @default(now())
+  used      Boolean        @default(false)
+  createdAt DateTime       @default(now())
   expiresAt DateTime?
-  team      Team      @relation(fields: [teamId], references: [id])
-  user      User      @relation(fields: [userId], references: [id])
+  team      Team           @relation(fields: [teamId], references: [id])
+  user      User           @relation(fields: [userId], references: [id])
+  role      PermissionType
 
-  @@id([userId, teamId])
+  @@id(id)
 }
 
 enum OtpType {

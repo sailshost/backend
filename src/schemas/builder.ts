@@ -44,11 +44,14 @@ export const builder = new SchemaBuilder<{
 }>({
   plugins: [
     PrismaPlugin,
+    ErrorsPlugin,
     ValidationPlugin,
     ScopeAuthPlugin,
     RelayPlugin,
-    ErrorsPlugin,
   ],
+  errorOptions: {
+    defaultTypes: [],
+  },
   // errorOptions: {
   //   defaultTypes: [ValidationError, NotFoundError],
   // },

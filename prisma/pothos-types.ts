@@ -1,11 +1,11 @@
-import type { Prisma, User, PasswordReset, Session, Container, Team, Membership } from "@prisma/client";
+import type { Prisma, User, PasswordReset, Session, Container, Team, Membership, TeamReferral } from "@prisma/client";
 export default interface PrismaTypes {
     User: {
         Shape: User;
         Include: Prisma.UserInclude;
         Where: Prisma.UserWhereUniqueInput;
-        Fields: "Teams" | "Session" | "Containers" | "PasswordReset";
-        ListRelations: "Teams" | "Session" | "Containers" | "PasswordReset";
+        Fields: "Teams" | "Session" | "Containers" | "PasswordReset" | "TeamReferral";
+        ListRelations: "Teams" | "Session" | "Containers" | "PasswordReset" | "TeamReferral";
         Relations: {
             Teams: {
                 Shape: Membership[];
@@ -22,6 +22,10 @@ export default interface PrismaTypes {
             PasswordReset: {
                 Shape: PasswordReset[];
                 Types: PrismaTypes["PasswordReset"];
+            };
+            TeamReferral: {
+                Shape: TeamReferral[];
+                Types: PrismaTypes["TeamReferral"];
             };
         };
     };
@@ -68,9 +72,13 @@ export default interface PrismaTypes {
         Shape: Team;
         Include: Prisma.TeamInclude;
         Where: Prisma.TeamWhereUniqueInput;
-        Fields: "members";
-        ListRelations: "members";
+        Fields: "referrals" | "members";
+        ListRelations: "referrals" | "members";
         Relations: {
+            referrals: {
+                Shape: TeamReferral[];
+                Types: PrismaTypes["TeamReferral"];
+            };
             members: {
                 Shape: Membership[];
                 Types: PrismaTypes["Membership"];
@@ -81,6 +89,23 @@ export default interface PrismaTypes {
         Shape: Membership;
         Include: Prisma.MembershipInclude;
         Where: Prisma.MembershipWhereUniqueInput;
+        Fields: "team" | "user";
+        ListRelations: never;
+        Relations: {
+            team: {
+                Shape: Team;
+                Types: PrismaTypes["Team"];
+            };
+            user: {
+                Shape: User;
+                Types: PrismaTypes["User"];
+            };
+        };
+    };
+    TeamReferral: {
+        Shape: TeamReferral;
+        Include: Prisma.TeamReferralInclude;
+        Where: Prisma.TeamReferralWhereUniqueInput;
         Fields: "team" | "user";
         ListRelations: never;
         Relations: {
