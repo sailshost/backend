@@ -34,23 +34,41 @@ input LoginInput {
   password: String!
 }
 
+type Membership {
+  team: Team!
+  teamId: ID!
+  userId: ID!
+}
+
 type Mutation {
-  cancelTeamInvite(input: TeamInput): User
-  createTeam(input: TeamInput): User!
-  deleteTeam(input: TeamInput): User!
+  cancelTeamInvite(input: TeamInput): Team
+  createTeam(input: TeamInput): Team!
+  deleteTeam(input: TeamInput): Team!
   disableOtp(input: DisableTOTPInput): User!
   edit(input: AccountInput): User!
-  editTeam(input: TeamInput): User!
+  editTeam(input: TeamInput): Team!
   enableOtp(input: EnableTOTPInput): User!
   login(input: LoginInput): User!
+  passwordReset(input: PasswordInput): User!
   signup(input: SignupInput): User!
-  teamInvite(input: TeamInput): User!
+  teamInvite(input: TeamInput): Team!
+}
+
+input PasswordInput {
+  currentPassword: String!
+  newPassword: String!
+  token: String!
+}
+
+input PasswordRequestInput {
+  email: String!
 }
 
 type Query {
   container: Container
   logout: User!
   me: User
+  passwordResetRequest(input: PasswordRequestInput): User!
   resolveContainer(input: ContainerInput): Container
   resolveOtp: User!
 }
@@ -61,6 +79,13 @@ input SignupInput {
   password: String!
   refer: String
   teamRefer: String
+}
+
+type Team {
+  id: ID!
+  logo: String
+  name: String
+  slug: String
 }
 
 input TeamInput {

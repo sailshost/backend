@@ -9,6 +9,34 @@ import { SESSION_TTL } from "../../utils/session";
 
 const uid = new ShortUniqueId();
 
+builder.prismaObject("Team", {
+  findUnique: (team) => ({ id: team.id }),
+  fields: (t) => ({
+    id: t.exposeID("id"),
+    name: t.exposeString("name", { nullable: true }),
+    slug: t.exposeString("slug", { nullable: true }),
+    logo: t.exposeString("logo", { nullable: true }),
+  }),
+});
+
+builder.prismaObject("Membership", {
+  findUnique: (mem) => ({ userId_teamId: { userId: mem.userId, teamId: mem.teamId } }),
+  fields: (t) => ({
+    teamId: t.exposeID("teamId", {}),
+    userId: t.exposeID("userId", {}),
+    team: t.relation("team", {
+      resolve: (query, team) => {
+        prisma.team.findUnique({
+          ...query,
+          where: {
+            id: team.teamId
+          }
+        })
+      }
+    })
+  }),
+});
+
 /*
 builder.prismaObject("Team", {
   findUnique: (team) => ({ id: team.id }),
@@ -34,7 +62,7 @@ builder.prismaObject("Team", {
 
 builder.mutationField("createTeam", (t) =>
   t.prismaField({
-    type: "User",
+    type: "Team",
     skipTypeScopes: true,
     authScopes: {
       user: true,
@@ -44,13 +72,6 @@ builder.mutationField("createTeam", (t) =>
       input: t.arg({ type: TeamInput }),
     },
     resolve: async (query, _root, { input }, { session }) => {
-      const user = await prisma.user.findUnique({
-        ...query,
-        where: { id: session?.userId },
-      });
-
-      if (!user) throw new AuthenticationError("invalid_user");
-
       const existingTeam = await prisma.team.count({
         where: {
           OR: [{ name: input!.name }, { slug: input!.slug }],
@@ -76,14 +97,14 @@ builder.mutationField("createTeam", (t) =>
         },
       });
 
-      return user;
+      return team;
     },
   })
 );
 
 builder.mutationField("editTeam", (t) =>
   t.prismaField({
-    type: "User",
+    type: "Team",
     skipTypeScopes: true,
     authScopes: {
       user: true,
@@ -109,7 +130,7 @@ builder.mutationField("editTeam", (t) =>
 
 builder.mutationField("teamInvite", (t) =>
   t.prismaField({
-    type: "User",
+    type: "Team",
     skipTypeScopes: true,
     authScopes: {
       user: true,
@@ -140,7 +161,7 @@ builder.mutationField("teamInvite", (t) =>
 
       if (!user) {
         const code = uid.stamp(32);
-        return await prisma.teamReferral.create({
+        await prisma.teamReferral.create({
           data: {
             id: code,
             teamId: input!.id!,
@@ -150,7 +171,7 @@ builder.mutationField("teamInvite", (t) =>
             role: input!.role! as Roles,
           },
         });
-        console.log(IS_PROD ? `https://sails.host/signup?refer=${code}` : `http://localhost:3000/signup?refer=${code}`)
+        return console.log(IS_PROD ? `https://sails.host/signup?refer=${code}` : `http://localhost:3000/signup?refer=${code}`)
       }
 
       // send email saying that the user has been invited to a team.
@@ -177,7 +198,7 @@ builder.mutationField("teamInvite", (t) =>
 
 builder.mutationField("cancelTeamInvite", (t) =>
   t.prismaField({
-    type: "User",
+    type: "Team",
     skipTypeScopes: true,
     authScopes: {
       user: true,
@@ -204,14 +225,14 @@ builder.mutationField("cancelTeamInvite", (t) =>
         },
       });
 
-      return session!.userId;
+      return membership;
     },
   })
 );
 
 builder.mutationField("deleteTeam", (t) =>
   t.prismaField({
-    type: "User",
+    type: "Team",
     skipTypeScopes: true,
     authScopes: {
       user: true,

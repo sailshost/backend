@@ -1,11 +1,11 @@
-import type { Prisma, User, PasswordReset, Session, Container, Team, Membership, TeamReferral } from "@prisma/client";
+import type { Prisma, User, PasswordReset, Session, Container, Team, Membership, TeamReferral, OtpCodes } from "@prisma/client";
 export default interface PrismaTypes {
     User: {
         Shape: User;
         Include: Prisma.UserInclude;
         Where: Prisma.UserWhereUniqueInput;
-        Fields: "Teams" | "Session" | "Containers" | "PasswordReset" | "TeamReferral";
-        ListRelations: "Teams" | "Session" | "Containers" | "PasswordReset" | "TeamReferral";
+        Fields: "Teams" | "Session" | "Containers" | "PasswordReset" | "TeamReferral" | "OtpCodes";
+        ListRelations: "Teams" | "Session" | "Containers" | "PasswordReset" | "TeamReferral" | "OtpCodes";
         Relations: {
             Teams: {
                 Shape: Membership[];
@@ -26,6 +26,10 @@ export default interface PrismaTypes {
             TeamReferral: {
                 Shape: TeamReferral[];
                 Types: PrismaTypes["TeamReferral"];
+            };
+            OtpCodes: {
+                Shape: OtpCodes[];
+                Types: PrismaTypes["OtpCodes"];
             };
         };
     };
@@ -113,6 +117,19 @@ export default interface PrismaTypes {
                 Shape: Team;
                 Types: PrismaTypes["Team"];
             };
+            user: {
+                Shape: User;
+                Types: PrismaTypes["User"];
+            };
+        };
+    };
+    OtpCodes: {
+        Shape: OtpCodes;
+        Include: Prisma.OtpCodesInclude;
+        Where: Prisma.OtpCodesWhereUniqueInput;
+        Fields: "user";
+        ListRelations: never;
+        Relations: {
             user: {
                 Shape: User;
                 Types: PrismaTypes["User"];
