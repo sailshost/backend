@@ -50,6 +50,7 @@ type Mutation {
   enableOtp(input: EnableTOTPInput): User!
   login(input: LoginInput): User!
   passwordReset(input: PasswordInput): User!
+  promoteTeamMember(input: TeamInput): Membership!
   signup(input: SignupInput): User!
   teamInvite(input: TeamInput): Team!
 }

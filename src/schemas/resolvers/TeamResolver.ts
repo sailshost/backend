@@ -9,6 +9,11 @@ import { SESSION_TTL } from "../../utils/session";
 
 const uid = new ShortUniqueId();
 
+enum Roles {
+  OWNER = "OWNER",
+  MEMBER = "MEMBER",
+}
+
 builder.prismaObject("Team", {
   findUnique: (team) => ({ id: team.id }),
   fields: (t) => ({
@@ -139,13 +144,9 @@ builder.mutationField("teamInvite", (t) =>
     args: {
       input: t.arg({ type: TeamInput }),
     },
-    resolve: async (_query, _root, { input }, { session }) => {
-      enum Roles {
-        OWNER = "OWNER",
-        MEMBER = "MEMBER",
-      }
-
+    resolve: async (query, _root, { input }, { session }) => {
       const team = await prisma.team.findUnique({
+        ...query,
         where: {
           id: input!.id!,
         },
@@ -219,6 +220,17 @@ builder.mutationField("cancelTeamInvite", (t) =>
 
       if(!membership) throw new Error("no_team_found");
 
+      const user = await prisma.membership.findFirst({
+        where: {
+          userId: session!.userId,
+          teamId: input!.id as string
+        }        
+      })
+
+      if(user?.role !== "OWNER") {
+        throw new Error("not_team_owner");
+      } 
+
       await prisma.membership.delete({
         where: {
           userId_teamId: { userId: input!.userId as string, teamId: input!.id! },
@@ -267,6 +279,46 @@ builder.mutationField("deleteTeam", (t) =>
       });
 
       return membership;
+    },
+  })
+);
+
+builder.mutationField("promoteTeamMember", (t) =>
+  t.prismaField({
+    type: "Membership",
+    skipTypeScopes: true,
+    authScopes: {
+      user: true,
+      $granted: "currentUser",
+    },
+    args: {
+      input: t.arg({ type: TeamInput }),
+    },
+    resolve: async (_query, _root, { input }, { session }) => {
+      if(!input?.id || !input?.userId || !input.role)
+        throw new Error("missing_credentials");
+
+      const membership = await prisma.membership.findFirst({
+        where: {
+          userId: session!.userId,
+          teamId: input!.id!,
+        },
+      });
+
+      if(!membership) 
+        throw new Error("team_not_found");
+
+      if (membership.role !== "OWNER")
+        throw new Error("not_team_owner");
+
+      return await prisma.membership.update({
+        where: {
+          userId_teamId: { userId: input!.userId as string, teamId: input!.id as string },
+        },
+        data: {
+          role: input!.role as Roles
+        }
+      });
     },
   })
 );
