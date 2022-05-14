@@ -26,5 +26,6 @@ export const TeamInput = builder.inputType("TeamInput", {
       },
     }),
     logo: t.string({ required: false }),
+    otp: t.string({ required: false }),
   }),
 });

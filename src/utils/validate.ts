@@ -1,7 +1,7 @@
-import { User } from "@prisma/client";
+import { OtpType, User } from "@prisma/client";
 import { authenticator } from "otplib";
 
-export function hasOTP(user: User, otp: string) {
+export function hasOTP(user: User, otp: string, type?: OtpType) {
   if (user.otpSecret !== null) {
     const isValid = authenticator.verify({
       secret: user.otpSecret,

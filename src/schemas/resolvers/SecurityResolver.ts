@@ -1,18 +1,14 @@
 import { AuthenticationError, ValidationError } from "apollo-server";
 import { builder } from "../builder";
 import { prisma } from "../prisma";
-import {
-  EnableTOTPInput,
-  DisableTOTPInput,
-} from "../inputs";
+import { EnableTOTPInput, DisableTOTPInput } from "../inputs";
 import argon from "argon2";
-import {
-  createAndDestroy,
-} from "../../utils/session";
+import { createAndDestroy } from "../../utils/session";
 import { authenticator } from "otplib";
 import { PasswordInput, PasswordRequestInput } from "../inputs/PasswordInput";
 import { add } from "date-fns";
 import ShortUniqueId from "short-unique-id";
+import { Result } from "./ResultResolver";
 
 const uid = new ShortUniqueId();
 
@@ -23,6 +19,9 @@ builder.queryField("resolveOtp", (t) =>
     authScopes: {
       user: true,
       $granted: "currentUser",
+    },
+    errors: {
+      types: [Error],
     },
     resolve: async (query, _root, { input }, { session }) => {
       let user = await prisma.user.findUnique({
@@ -60,6 +59,9 @@ builder.mutationField("enableOtp", (t) =>
       user: true,
       $granted: "currentUser",
     },
+    errors: {
+      types: [Error],
+    },
     args: {
       input: t.arg({ type: EnableTOTPInput }),
     },
@@ -75,7 +77,7 @@ builder.mutationField("enableOtp", (t) =>
       }
 
       const isValid = authenticator.verify({
-        secret: input!.secret,
+        secret: user!.otpOnboard!,
         token: input!.token,
       });
 
@@ -89,9 +91,9 @@ builder.mutationField("enableOtp", (t) =>
           id: session!.userId,
         },
         data: {
-          otpSecret: input!.secret,
+          otpSecret: user.otpOnboard,
           otpBackup: [],
-          otpType: "GEN"
+          otpType: "GEN",
         },
       });
 
@@ -107,6 +109,9 @@ builder.mutationField("disableOtp", (t) =>
     authScopes: {
       user: true,
       $granted: "currentUser",
+    },
+    errors: {
+      types: [Error],
     },
     args: {
       input: t.arg({ type: DisableTOTPInput }),
@@ -147,40 +152,43 @@ builder.mutationField("disableOtp", (t) =>
 );
 
 builder.queryField("passwordResetRequest", (t) =>
-  t.prismaField({
-    type: "User",
+  t.field({
+    type: Result,
     skipTypeScopes: true,
     authScopes: {
       unauthenticated: false,
     },
+    errors: {
+      types: [Error],
+    },
     args: {
       input: t.arg({ type: PasswordRequestInput }),
     },
-    resolve: async (query, _root, { input }, { session }) => {
-      if (!input?.email)
-        throw new AuthenticationError("missing_credentials");
+    resolve: async (parent, { input }, { session }) => {
+      if (!input?.email) throw new AuthenticationError("missing_credentials");
 
       let user = await prisma.user.findUnique({
-        ...query,
         where: { email: input!.email },
         rejectOnNotFound: true,
       });
 
-      if(!user) throw new AuthenticationError("invalid_credentials");
+      if (!user) throw new AuthenticationError("invalid_credentials");
 
-      const code = uid.stamp(32)
+      const code = uid.stamp(32);
 
       await prisma.passwordReset.create({
         data: {
           id: code,
           userId: user.id,
-          expiresAt: add(new Date(), { days: 1 })
-        }
-      })
+          expiresAt: add(new Date(), { days: 1 }),
+        },
+      });
+
+      // send email
 
       console.log("TEST CODE -> ", code);
 
-      return user;
+      return Result.OK;
     },
   })
 );
@@ -192,6 +200,9 @@ builder.mutationField("passwordReset", (t) =>
     authScopes: {
       user: true,
       $granted: "currentUser",
+    },
+    errors: {
+      types: [Error],
     },
     args: {
       input: t.arg({ type: PasswordInput }),
@@ -210,13 +221,14 @@ builder.mutationField("passwordReset", (t) =>
       const user = await prisma.user.findUnique({
         ...query,
         where: {
-          id: session?.userId
-        }
+          id: session?.userId,
+        },
       });
 
-      if(!user) throw new AuthenticationError("invalid_user");
+      if (!user) throw new AuthenticationError("invalid_user");
 
-      if (!token || token.used === true) throw new AuthenticationError("invalid_token");
+      if (!token || token.used === true)
+        throw new AuthenticationError("invalid_token");
 
       const valid = await argon.verify(user!.password, input!.currentPassword);
 
@@ -227,20 +239,20 @@ builder.mutationField("passwordReset", (t) =>
       await prisma.user.update({
         ...query,
         where: {
-          id: session?.userId
+          id: session?.userId,
         },
         data: {
-          password: hash
-        }
+          password: hash,
+        },
       });
 
       await prisma.passwordReset.update({
         where: {
-          id: input!.token
+          id: input!.token,
         },
         data: {
-          used: true
-        }
+          used: true,
+        },
       });
 
       await createAndDestroy({

@@ -17,6 +17,7 @@ model User {
   id               String          @id @default(cuid())
   firstName        String?
   lastName         String?
+  username         String
   avatar           String?         @default("https://avatar.tobi.sh/sails.jpg")
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
@@ -30,6 +31,7 @@ model User {
   otpOnboard       String?
   otpBackup        String[]
   otpType          OtpType?
+  UserPlan         UserPlan        @default(NORMAL)
   Teams            Membership[]
   Session          Session[]
   Containers       Container[]
@@ -57,6 +59,7 @@ model Session {
   user      User?     @relation(fields: [userId], references: [id])
   userId    String
   ip        String
+  lastIp    String?
   userAgent String
   expiresAt DateTime?
   type      AuthType?
@@ -109,13 +112,11 @@ model TeamReferral {
 }
 
 model OtpCodes {
-  id        String
+  code      String   @id
   userId    String
   used      Boolean  @default(false)
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
-
-  @@id(id)
 }
 
 enum OtpType {
@@ -132,6 +133,11 @@ enum UserType {
   NORMAL
   STAFF
   ADMIN
+}
+
+enum UserPlan {
+  NORMAL
+  PRO
 }
 
 enum PermissionType {

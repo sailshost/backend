@@ -4,7 +4,7 @@ import { ApolloServer, ApolloError } from "apollo-server-express";
 import cors from "cors";
 import schema from "./schemas/index";
 import { IS_PROD } from "./export";
-import Redis from "redis";
+import { createClient } from "redis";
 import { createGraphQLContext } from "./schemas/builder";
 import { ApolloServerPluginLandingPageDisabled } from "apollo-server-core";
 import { ironSession } from "next-iron-session";
@@ -13,9 +13,12 @@ import { graphqlUploadExpress } from "graphql-upload";
 
 const app = express();
 const port = 4000 || (process.env.PORT as unknown as number);
+export const redis = createClient({
+  url: `redis://${process.env.REDIS_IP}:6379`,
+});
 
 const start = async () => {
-  // const redis = Redis.createClient({ host: process.env.REDIS_IP });
+  redis.connect();
 
   app.use(ironSession(sessionOptions));
 

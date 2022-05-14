@@ -21,6 +21,8 @@ builder.prismaObject("User", {
     id: t.exposeID("id"),
     firstName: t.exposeString("firstName", { nullable: true }),
     lastName: t.exposeString("lastName", { nullable: true }),
+    username: t.exposeString("username", { nullable: true }),
+    roles: t.exposeString("userType", { nullable: true }),
     avatar: t.exposeString("avatar", { nullable: true }),
     otpOnboard: t.exposeString("otpOnboard", { nullable: true }),
     otpSecret: t.exposeString("otpSecret", { nullable: true }),
@@ -32,11 +34,18 @@ builder.prismaObject("User", {
         }),
     }),
     createdAt: t.expose("createdAt", { type: "DateTime" }),
-    updatedAt: t.expose("updatedAt", { type: "DateTime" })
+    updatedAt: t.expose("updatedAt", { type: "DateTime" }),
   }),
 });
 
-builder.queryField("me", (t) =>
+builder.objectType(Error, {
+  name: "Error",
+  fields: (t) => ({
+    message: t.exposeString("message"),
+  }),
+});
+
+builder.queryField("currentUser", (t) =>
   t.prismaField({
     type: "User",
     nullable: true,
@@ -63,11 +72,14 @@ builder.mutationField("signup", (t) =>
     authScopes: {
       unauthenticated: false,
     },
+    errors: {
+      types: [Error],
+    },
     args: {
       input: t.arg({ type: SignupInput }),
     },
     resolve: async (query, _root, { input }, ctx) => {
-      if (!input?.email || !input?.password)
+      if (!input?.email || !input?.password || !input?.username)
         throw new AuthenticationError("missing_credentials");
 
       const user = await prisma.user.findUnique({
@@ -86,16 +98,16 @@ builder.mutationField("signup", (t) =>
         },
       });
 
-      if(input.teamRefer) {
+      if (input.teamRefer) {
         const team = await prisma.teamReferral.findUnique({
           where: {
             id: input.teamRefer,
           },
         });
 
-        if(!team) throw new Error("no_team_found");
+        if (!team) throw new Error("no_team_found");
 
-        if(team.used === true) throw new Error("team_code_already_used");
+        if (team.used === true) throw new Error("team_code_already_used");
 
         await prisma.membership.create({
           data: {
@@ -127,12 +139,12 @@ builder.mutationField("login", (t) =>
     authScopes: {
       unauthenticated: false,
     },
+    errors: {
+      types: [Error],
+    },
     args: {
       input: t.arg({ type: LoginInput }),
     },
-    // errors: {
-    //   types: [ValidationError]
-    // },
     resolve: async (query, _root, { input }, { req, session }) => {
       if (!input?.email || !input?.password)
         throw new AuthenticationError("missings_credentials");

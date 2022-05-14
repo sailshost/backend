@@ -6,6 +6,7 @@ import { prisma } from "../prisma";
 import { addSeconds, differenceInSeconds } from "date-fns";
 import ShortUniqueId from "short-unique-id";
 import { SESSION_TTL } from "../../utils/session";
+import { hasOTP } from "../../utils/validate";
 
 const uid = new ShortUniqueId();
 
@@ -42,29 +43,6 @@ builder.prismaObject("Membership", {
   }),
 });
 
-/*
-builder.prismaObject("Team", {
-  findUnique: (team) => ({ id: team.id }),
-  fields: (t) => ({
-    id: t.exposeID("id", {}),
-    membership: t.relation("members", {
-      resolve: (query, members) =>
-        prisma.membership.findMany({
-          ...query,
-          where: { teamId: members.id },
-        }),
-    }),
-  }),
-});
-
-builder.prismaObject("Team", {
-  findUnique: (team) => ({ id: team.id }),
-  fields: (t) => ({
-    id: t.exposeID("id", {}),
-  }),
-});
-*/
-
 builder.mutationField("createTeam", (t) =>
   t.prismaField({
     type: "Team",
@@ -72,6 +50,9 @@ builder.mutationField("createTeam", (t) =>
     authScopes: {
       user: true,
       $granted: "currentUser",
+    },
+    errors: {
+      types: [Error],
     },
     args: {
       input: t.arg({ type: TeamInput }),
@@ -115,6 +96,9 @@ builder.mutationField("editTeam", (t) =>
       user: true,
       $granted: "currentUser",
     },
+    errors: {
+      types: [Error],
+    },
     args: {
       input: t.arg({ type: TeamInput }),
     },
@@ -140,6 +124,9 @@ builder.mutationField("teamInvite", (t) =>
     authScopes: {
       user: true,
       $granted: "currentUser",
+    },
+    errors: {
+      types: [Error],
     },
     args: {
       input: t.arg({ type: TeamInput }),
@@ -205,6 +192,9 @@ builder.mutationField("cancelTeamInvite", (t) =>
       user: true,
       $granted: "currentUser",
     },
+    errors: {
+      types: [Error],
+    },
     nullable: true,
     args: {
       input: t.arg({ type: TeamInput }),
@@ -250,6 +240,9 @@ builder.mutationField("deleteTeam", (t) =>
       user: true,
       $granted: "currentUser",
     },
+    errors: {
+      types: [Error],
+    },
     args: {
       input: t.arg({ type: TeamInput }),
     },
@@ -262,9 +255,17 @@ builder.mutationField("deleteTeam", (t) =>
         },
       });
 
+      const user = await prisma.user.findUnique({
+        where: {
+          id: session?.userId
+        }
+      });
+
       if (!membership || membership.role !== "OWNER") {
         throw new Error("not_team_owner");
       }
+
+      hasOTP(user!, input!.otp as string);
 
       await prisma.membership.delete({
         where: {
@@ -290,6 +291,9 @@ builder.mutationField("promoteTeamMember", (t) =>
     authScopes: {
       user: true,
       $granted: "currentUser",
+    },
+    errors: {
+      types: [Error],
     },
     args: {
       input: t.arg({ type: TeamInput }),

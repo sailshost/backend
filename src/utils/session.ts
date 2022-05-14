@@ -5,6 +5,7 @@ import { IS_PROD, SAILS_COOKIE } from "../export";
 import { addSeconds, differenceInSeconds } from "date-fns";
 import { Request, Response } from "express";
 import ip from "request-ip";
+import { redis } from "..";
 
 if (!process.env.PASSWORD)
   console.warn("There was no environment variable set for `PASSWORD`");
@@ -40,6 +41,7 @@ interface Options {
   authType?: AuthType;
 }
 
+// TODO: if new location is detected, and not authorized, notice the user.
 export async function createSession(
   req: Request,
   user: User,
@@ -59,6 +61,7 @@ export async function createSession(
   const requestWithSession = req as unknown as RequestWithSession;
 
   // cache session
+  await redis.set(`sess:${session.id}`, user.id);
 
   requestWithSession.session.set("sessionID", session.id);
   await requestWithSession.session.save();
@@ -75,11 +78,11 @@ export async function destroyAllSessions(
   await prisma.$executeRaw`DELETE FROM "Session" WHERE "userId" = ${user.id}`;
 
   await prisma.session.deleteMany({
-    where: { 
+    where: {
       userId: user?.id,
       type: {
-        equals: "OTP"
-      }
+        equals: "OTP",
+      },
     },
   });
 
@@ -99,6 +102,7 @@ export async function destroySession(
 
   requestWithSession.session.destroy();
 
+  await redis.del(`sess:${session.id}`);
   await prisma.session.delete({ where: { id: session?.id } });
 }
 
@@ -140,6 +144,11 @@ export async function getSession(
 
         await requestWithSession.session.save();
       }
+
+      // WIP:
+      // if (session.ip !== session.lastIp) {
+      //   console.log("<--> SailsBackend: detected new ip");
+      // }
     }
   }
 

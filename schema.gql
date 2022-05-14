@@ -24,8 +24,11 @@ input DisableTOTPInput {
 }
 
 input EnableTOTPInput {
-  secret: String!
   token: String!
+}
+
+type Error {
+  message: String!
 }
 
 input LoginInput {
@@ -41,18 +44,90 @@ type Membership {
 }
 
 type Mutation {
-  cancelTeamInvite(input: TeamInput): Team
-  createTeam(input: TeamInput): Team!
-  deleteTeam(input: TeamInput): Team!
-  disableOtp(input: DisableTOTPInput): User!
-  edit(input: AccountInput): User!
-  editTeam(input: TeamInput): Team!
-  enableOtp(input: EnableTOTPInput): User!
-  login(input: LoginInput): User!
-  passwordReset(input: PasswordInput): User!
-  promoteTeamMember(input: TeamInput): Membership!
-  signup(input: SignupInput): User!
-  teamInvite(input: TeamInput): Team!
+  cancelTeamInvite(input: TeamInput): MutationCancelTeamInviteResult
+  createTeam(input: TeamInput): MutationCreateTeamResult!
+  deleteTeam(input: TeamInput): MutationDeleteTeamResult!
+  disableOtp(input: DisableTOTPInput): MutationDisableOtpResult!
+  edit(input: AccountInput): MutationEditResult!
+  editTeam(input: TeamInput): MutationEditTeamResult!
+  enableOtp(input: EnableTOTPInput): MutationEnableOtpResult!
+  login(input: LoginInput): MutationLoginResult!
+  passwordReset(input: PasswordInput): MutationPasswordResetResult!
+  promoteTeamMember(input: TeamInput): MutationPromoteTeamMemberResult!
+  signup(input: SignupInput): MutationSignupResult!
+  teamInvite(input: TeamInput): MutationTeamInviteResult!
+}
+
+union MutationCancelTeamInviteResult = Error | MutationCancelTeamInviteSuccess
+
+type MutationCancelTeamInviteSuccess {
+  data: Team!
+}
+
+union MutationCreateTeamResult = Error | MutationCreateTeamSuccess
+
+type MutationCreateTeamSuccess {
+  data: Team!
+}
+
+union MutationDeleteTeamResult = Error | MutationDeleteTeamSuccess
+
+type MutationDeleteTeamSuccess {
+  data: Team!
+}
+
+union MutationDisableOtpResult = Error | MutationDisableOtpSuccess
+
+type MutationDisableOtpSuccess {
+  data: User!
+}
+
+union MutationEditResult = Error | MutationEditSuccess
+
+type MutationEditSuccess {
+  data: User!
+}
+
+union MutationEditTeamResult = Error | MutationEditTeamSuccess
+
+type MutationEditTeamSuccess {
+  data: Team!
+}
+
+union MutationEnableOtpResult = Error | MutationEnableOtpSuccess
+
+type MutationEnableOtpSuccess {
+  data: User!
+}
+
+union MutationLoginResult = Error | MutationLoginSuccess
+
+type MutationLoginSuccess {
+  data: User!
+}
+
+union MutationPasswordResetResult = Error | MutationPasswordResetSuccess
+
+type MutationPasswordResetSuccess {
+  data: User!
+}
+
+union MutationPromoteTeamMemberResult = Error | MutationPromoteTeamMemberSuccess
+
+type MutationPromoteTeamMemberSuccess {
+  data: Membership!
+}
+
+union MutationSignupResult = Error | MutationSignupSuccess
+
+type MutationSignupSuccess {
+  data: User!
+}
+
+union MutationTeamInviteResult = Error | MutationTeamInviteSuccess
+
+type MutationTeamInviteSuccess {
+  data: Team!
 }
 
 input PasswordInput {
@@ -67,11 +142,28 @@ input PasswordRequestInput {
 
 type Query {
   container: Container
+  currentUser: User
   logout: User!
-  me: User
-  passwordResetRequest(input: PasswordRequestInput): User!
+  passwordResetRequest(input: PasswordRequestInput): QueryPasswordResetRequestResult!
   resolveContainer(input: ContainerInput): Container
-  resolveOtp: User!
+  resolveOtp: QueryResolveOtpResult!
+}
+
+union QueryPasswordResetRequestResult = Error | QueryPasswordResetRequestSuccess
+
+type QueryPasswordResetRequestSuccess {
+  data: Result!
+}
+
+union QueryResolveOtpResult = Error | QueryResolveOtpSuccess
+
+type QueryResolveOtpSuccess {
+  data: User!
+}
+
+enum Result {
+  FAIL
+  OK
 }
 
 input SignupInput {
@@ -80,6 +172,7 @@ input SignupInput {
   password: String!
   refer: String
   teamRefer: String
+  username: String!
 }
 
 type Team {
@@ -94,6 +187,7 @@ input TeamInput {
   id: String
   logo: String
   name: String
+  otp: String
   role: String
   slug: String
   userId: String
@@ -108,5 +202,7 @@ type User {
   lastName: String
   otpOnboard: String
   otpSecret: String
+  roles: String
   updatedAt: DateTime!
+  username: String
 }

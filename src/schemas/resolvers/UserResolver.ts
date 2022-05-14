@@ -13,12 +13,12 @@ builder.mutationField("edit", (t) =>
       user: true,
       $granted: "currentUser",
     },
+    errors: {
+      types: [Error],
+    },
     args: {
       input: t.arg({ type: AccountInput }),
     },
-    // errors: {
-    //   types: [ValidationError]
-    // },
     resolve: async (query, _root, { input }, { session }) => {
       const user = await prisma.user.findUnique({
         ...query,
@@ -28,18 +28,6 @@ builder.mutationField("edit", (t) =>
       if (!user) throw new AuthenticationError("invalid_user");
 
       hasOTP(user, input!.otp as string);
-
-      /*
-      await prisma.team.update({
-        where: {
-          id: team.id,
-        },
-        data: {
-          firstName,
-          lastName
-        },
-      });
-      */
 
       if (user.firstName) {
         return await prisma.user.update({
