@@ -42,7 +42,7 @@
     "@pothos/plugin-validation": "^3.0.0",
     "@prisma/client": "^3.8.1",
     "@prisma/engines": "^3.1.0-2.eb8eb4c97238c32c9e71756e76d59ed5e502185a",
-    "apollo-server": "^3.3.0",
+    "apollo-server": "^3.13.0",
     "apollo-server-core": "^3.3.0",
     "argon2": "^0.28.2",
     "axios": "^0.21.4",
